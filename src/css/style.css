@@ -1,0 +1,426 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+body {
+    background: rgb(16,16,24);
+}
+
+/* ============== */
+/* === HEADER === */
+/* ============== */
+header {
+    width: 100%;
+    height: 64px;
+    background: rgb(16,16,24);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+header .content {
+    padding: 16px;
+    max-width: calc(256px * 4 + 16px * 3);
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+}
+header .content h1 {
+    height:      32px;
+    font-size:   32px;
+    line-height: 32px;
+    color: white;
+}
+header .content h1 a {
+    color: inherit;
+    text-decoration: none;
+}
+header .content h1 a:hover {
+    color: rgb(64,128,255);
+    text-decoration: underline;
+}
+header nav {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+header nav #searcher {
+    display: flex;
+    border-radius: 8px;
+    margin: 0 0;
+    background-color: white;
+}
+header nav #searcher input {
+    border: 0;
+    background-color: transparent;
+    height: 24px;
+    padding: 4px 8px;
+}
+header nav #searcher input:focus {
+    outline: none;
+}
+header nav #searcher.hidden input {
+    display: none;
+}
+header nav #searcher button {
+    border: 0;
+    background-color: transparent;
+    width: 32px;
+    height: 32px;
+}
+header nav a {
+    padding: 8px;
+    height:      16px;
+    font-size:   16px;
+    line-height: 16px;
+    text-decoration: none;
+    color: white;
+}
+header nav a:hover {
+    color: rgb(64,128,255);
+}
+header nav .sub {
+    display: flex;
+    flex-direction: column;
+}
+header nav .sub > a {
+    text-align: right;
+}
+header nav .sub > div{
+    display: none;
+    background: rgb(16,16,24);
+}
+header nav .sub:hover > div {
+    display: flex;
+    flex-direction: column;
+    border-radius: 0 0 8px 8px;   
+    position: sticky;
+    z-index: 2;
+    /* border-top: 4px solid rgb(64,96,128); */
+    /* border-left: 4px solid rgb(64,96,128); */
+    /* border-right: 4px solid rgb(64,96,128); */
+    border-bottom: 4px solid rgb(64,96,128);
+    /* box-shadow: 0px 0px 8px 4px black; */
+    outline: 4px solid rgb(16,16,24);
+    outline-offset: -4px -4px 0 -4px;
+}
+header nav .sub:hover > div a{
+    padding: 8px 16px;
+}
+
+/* ============ */
+/* === MAIN === */
+/* ============ */
+main {
+    padding: 16px;
+    max-width: calc(256px * 4 + 16px * 3);
+    margin: auto;
+    padding-top: 0;
+}
+main section {
+
+}
+main section h2 {
+    position: sticky;
+    padding: 16px 0;
+    top: calc(64px);
+    background-color: rgb(16,16,24);
+    color: rgb(192,208,255);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 1;
+}
+main section#repository h2 {
+    justify-content: start;
+}
+main section .content {
+    display: grid;
+    flex-wrap: wrap;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding-bottom: 64px;
+}
+main section .content h3 {
+    width: 100%;
+    grid-column-start: 1;
+    grid-column-end: 5;
+    text-align: center;
+    color: rgb(192,  128,  160);
+}
+@media screen and (max-width: calc(256px * 4 + 16px * 3)) { main section .content { grid-template-columns: repeat(3, 1fr); } }
+@media screen and (max-width: calc(256px * 3 + 16px * 2)) { main section .content { grid-template-columns: repeat(2, 1fr); } }
+@media screen and (max-width: calc(256px * 2 + 16px * 1)) { main section .content { grid-template-columns: repeat(1, 1fr); } }
+
+/* ============= */
+/* === CARDS === */
+/* ============= */
+.card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+.card .page {
+    width: 100%;
+    height: 20px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: -16px;
+    font-size: 20px;
+    line-height: 20px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    padding: 4px 0px;
+    z-index: 1;
+}
+.card .image {
+    width: calc(100% - 8px);
+    aspect-ratio: 16/10;
+    border-radius: 16px;
+    border: 4px solid transparent;
+    overflow: hidden;
+    /* margin-bottom: 8px; */
+    display: flex;
+    align-items: center;
+}
+.card .image img {
+    width: calc(100%);
+    min-height: 100%;
+}
+.card .title {
+    width:       100%;
+    font-size:   20px;
+    line-height: 20px;
+    font-weight: bold;
+    margin-top:   4px;
+}
+.card .episode {
+    width:       100%;
+    height:      16px;
+    font-size:   16px;
+    line-height: 16px;
+    margin-top:   4px;
+    font-weight: bold;
+}
+.card .episode::before {
+    content: 'Episodio ';
+}
+.card .hover {
+    display: none;
+    flex-direction: column;
+    font-size: 12px;
+    line-height: 16px;
+    border: 1px solid black;
+    background-color: rgb(255,255,255);
+    padding: 4px 6px;
+    user-select: none;
+}
+.card:hover .hover {
+    display: flex;
+    position: fixed;
+    top: calc(var(--hover-top) + 16px);
+    left: calc(var(--hover-left) + 16px);
+}
+/* ============================== */
+/* === CARD VARIANT - UNKNOWN === */
+/* ============================== */
+.card.unknown       .page    {                                                                  background-color: rgb( 80,  80,  80); }
+.card.unknown:hover .page    { color: rgb( 16,  16,  16); border-color: rgb(128, 128, 128); background-color: rgb( 128, 128, 128); }
+.card.unknown       .image   {                              border-color: rgb( 80,  80,  80); }
+.card.unknown:hover .image   {                              border-color: rgb(112, 112, 112); }
+.card.unknown       .title   { color: rgb(160, 160, 160); }
+.card.unknown:hover .title   { color: rgb(112, 112, 112); }
+.card.unknown       .title b { color: rgb(160, 160, 160); }
+.card.unknown:hover .title b { color: rgb(128, 128, 128); }
+.card.unknown       .episode { color: rgb( 96,  96,  96); }
+.card.unknown:hover .episode { color: rgb(160, 160, 160); }
+.card.unknown       .hover b { color: rgb(192, 128, 160); }
+.card.unknown:hover .hover b { color: rgb(255,  64, 128); }
+/* ============================ */
+/* === CARD VARIANT - ANIME === */
+/* ============================ */
+.card.anime       .page    {                                                                  background-color: rgb( 80,  80,  96); }
+.card.anime:hover .page    { color: rgb( 16,  16,  24); border-color: rgb( 64, 128, 255); background-color: rgb( 64, 128, 255); }
+.card.anime       .image   {                              border-color: rgb( 80,  80,  96); }
+.card.anime:hover .image   {                              border-color: rgb( 64, 128, 255); }
+.card.anime       .title   { color: rgb(128, 160, 192); }
+.card.anime:hover .title   { color: rgb( 64, 128, 255); }
+.card.anime       .title b { color: rgb(192, 128, 160); }
+.card.anime:hover .title b { color: rgb(255,  64, 128); }
+.card.anime       .episode { color: rgb( 64,  96, 128); }
+.card.anime:hover .episode { color: rgb(128, 160, 192); }
+.card.anime       .hover b { color: rgb(192, 128, 160); }
+.card.anime:hover .hover b { color: rgb(255,  64, 128); }
+/* ============================= */
+/* === CARD VARIANT - HENTAI === */
+/* ============================= */
+body:not(.ac) .card.hentai .image img { filter: blur(16px); scale: 1.125; } 
+body:not(.ac) .card.hentai .title     { filter: blur( 4px); } 
+body:not(.ac) .card.hentai .episode   { filter: blur( 4px); } 
+body:not(.ac) .card.hentai .hover     { filter: blur( 4px); z-index: 1; } 
+.card.hentai       .page    {                                                                  background-color: rgb( 96,  80,  80); }
+.card.hentai:hover .page    { color: rgb( 24,  16,  16); border-color: rgb(255, 064, 128); background-color: rgb(255,  64, 128); }
+.card.hentai       .image   {                              border-color: rgb( 96,  80,  80); }
+.card.hentai:hover .image   {                              border-color: rgb(255, 064, 128); }
+.card.hentai       .title   { color: rgb(192, 128, 160); }
+.card.hentai:hover .title   { color: rgb(255,  64, 128); }
+.card.hentai       .title b { color: rgb(128, 160, 255); }
+.card.hentai:hover .title b { color: rgb( 64, 128, 255); }
+.card.hentai       .episode { color: rgb(128,  64,  96); }
+.card.hentai:hover .episode { color: rgb(192, 128, 160); }
+.card.hentai       .hover b { color: rgb(128, 160, 255); }
+.card.hentai:hover .hover b { color: rgb( 64, 128, 255); }
+
+/* ================= */
+/* === NAVIGATOR === */
+/* ================= */
+.navigator {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: calc(256px * 4 + 16px * 3);
+    user-select: none;
+}
+.navigator .content {
+    display: flex;
+    width: fit-content;
+    background-color: rgb(16,16,24);
+    margin: auto;
+    border: 4px solid rgb( 80,  80, 96);
+    border-bottom: 0;
+    border-radius: 16px 16px 0 0;
+    padding: 8px;
+    gap: 8px;
+}
+.navigator .content a {
+    color: white;
+    display: block;
+    width: 24px;
+    height: 16px;
+    font-size: 16px;
+    border-radius: 8px;
+    line-height: 16px;
+    padding: 8px;
+    text-align: center;
+    flex: 0 0 auto;
+    font-family: monospace;
+    text-decoration: none;
+    background-color: rgb( 128, 128, 128);
+}
+.navigator .content a.current {
+    background-color:rgb(192, 128, 160);
+}
+.navigator .content a.button {
+    background-color:rgb(128, 160, 192);
+}
+.navigator .content a.button:hover {
+    background-color:rgb( 64, 128, 255);
+}
+
+/* ============= */
+/* === MODAL === */
+/* ============= */
+#modal {
+    position: fixed;
+    top: 0;
+    z-index: 3;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: rgb(0, 0, 0, 0.75);
+    align-items: center;
+}
+#modal > .content {
+    border: 16px solid rgb(16, 16, 24);
+    background-color: rgb(16, 16, 24);
+    border-radius: 24px;
+    width: calc(256px * 4 + 16px * 3);
+    max-width: calc(100% - 64px);
+    max-height: calc(100% - 16px * 2 * 2);
+    box-shadow: 0px 0px 16px rgb(80, 80, 96);
+    display: flex;
+    flex-direction: column;
+}
+@media screen and (max-width: calc(256px * 5 + 16px * 4)) { #modal > .content { width: min(calc(256px * 4 + 16px * 3), 100% - 64px); } }
+@media screen and (max-width: calc(256px * 4 + 16px * 3)) { #modal > .content { width: min(calc(256px * 3 + 16px * 2), 100% - 64px); } }
+@media screen and (max-width: calc(256px * 3 + 16px * 2)) { #modal > .content { width: min(calc(256px * 2 + 16px * 1), 100% - 64px); } }
+#modal > .content .head {
+    width: 100%;
+    max-height: 64px;
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid rgb(16,16,24);
+    padding-bottom: 16px;
+    /* margin-bottom: 16px; */
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    background: rgb(16,16,24);
+}
+#modal > .content .head .back {
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    border: 1px solid rgb(0,0,8);
+    color: rgb(0,0,8);
+    background: rgb(80,80,96);
+}
+#modal > .content .head .back:hover {
+    background: rgb(64,128,255);
+}
+#modal > .content .head .info {
+    width: calc(100%);
+}
+#modal > .content .head .info .title {
+    width: calc(100%);
+    font-size: 24px;
+    line-height: 24px;
+    font-weight: bold;
+    color: rgb(128,160,192);
+}
+#modal > .content .head .info .sub-title {
+    width: calc(100%);
+    height: 16px;
+    font-size: 16px;
+    line-height: 16px;
+    font-weight: bold;
+    color: rgb(64,96,128);
+}
+#modal > .content .head .close {
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    border: 1px solid rgb(0,0,8);
+    color: rgb(0,0,8);
+    background: rgb(80,80,96);
+}
+#modal > .content .head .close:hover {
+    background: rgb(64,128,255);
+}
+#modal > .content .body {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    justify-content: center;
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding-bottom: 52px;
+}
+#modal > .content .navigator {
+    position: relative;
+    bottom: 36px;
+    margin-bottom: -52px;
+}
+@media screen and (max-width: calc(256px * 5 + 16px * 4)) { #modal > .content .body { grid-template-columns: repeat(4, 1fr); } }
+@media screen and (max-width: calc(256px * 4 + 16px * 3)) { #modal > .content .body { grid-template-columns: repeat(3, 1fr); } }
+@media screen and (max-width: calc(256px * 3 + 16px * 2)) { #modal > .content .body { grid-template-columns: repeat(2, 1fr); } }
+@media screen and (max-width: calc(256px * 2 + 16px * 1)) { #modal > .content .body { grid-template-columns: repeat(1, 1fr); } }

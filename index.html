@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>SQLite sin Backend (con fetch)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #ccc;
+      border-collapse: collapse;
+      padding: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Consulta de base de datos SQLite cargada con fetch</h2>
+  <p><strong>Nota:</strong> Asegúrate de tener <code>data.db</code> en la misma carpeta que este archivo.</p>
+
+  <label for="query">Consulta SQL:</label>
+  <input type="text" id="query" value="SELECT * FROM anime_view;" style="width: 80%;" />
+  <button onclick="runQuery()">Ejecutar</button>
+
+  <div id="output" style="margin-top: 20px;"></div>
+
+  <script>
+    let db;
+
+    async function loadDatabase() {
+      const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}` });
+      const response = await fetch("./text/database.db");
+      const buffer = await response.arrayBuffer();
+      db = new SQL.Database(new Uint8Array(buffer));
+      console.log("Base de datos cargada.");
+    }
+    function resultToJSON(rawData) {
+      const JSONResult = [];
+
+      if (!rawData || rawData.length === 0) return JSONResult;
+
+      const { columns, values } = rawData[0];
+
+      values.forEach(row => {
+        const json = {};
+
+        row.forEach((val, idx) => {
+          const key = columns[idx];
+
+          // Intentar parsear si el valor es string y parece JSON
+          if (typeof val === "string" && (val.startsWith("[") || val.startsWith("{"))) {
+            try {
+              json[key] = JSON.parse(val);
+            } catch {
+              json[key] = val; // si falla, dejar como está
+            }
+          } else {
+            json[key] = val;
+          }
+        });
+
+        JSONResult.push(json);
+      });
+
+      return JSONResult;
+
+    }
+    async function runQuery() {
+      const query = document.getElementById('query').value;
+      const output = document.getElementById('output');
+      output.innerHTML = '';
+
+      try {
+        const result = db.exec(query);
+        if (result.length === 0) {
+          output.innerText = "Consulta ejecutada, pero no hay resultados.";
+          return;
+        }
+        const parsedData = resultToJSON(result);
+        console.log("Datos procesados:", parsedData);
+
+        const table = document.createElement('table');
+        const header = table.insertRow();
+        result[0].columns.forEach(col => {
+          const th = document.createElement('th');
+          th.textContent = col;
+          header.appendChild(th);
+        });
+
+        result[0].values.forEach(row => {
+          const tr = table.insertRow();
+          row.forEach(cell => {
+            const td = tr.insertCell();
+            td.textContent = cell;
+          });
+        });
+
+        output.appendChild(table);
+      } catch (err) {
+        output.innerText = "Error: " + err.message;
+      }
+    }
+    async function main(params) {
+      await loadDatabase(); // Se ejecuta al cargar la página
+      // runQuery();
+    }
+    main();
+  </script>
+</body>
+
+</html>
