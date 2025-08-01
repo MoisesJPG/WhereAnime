@@ -9,7 +9,7 @@ export class database {
     static #data = [];
     static async load() {
         try {
-            const res = await fetch('/src/db/database.json');
+            const res = await fetch('/WhereAnime/src/db/database.json');
             const data = await res.json();
             this.#data = data;
             log(`La base de datos se ha cargado`);
