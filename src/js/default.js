@@ -19,11 +19,11 @@ function generateHeader() {
     let AC = localStorage.getItem("ac") === "true";
     header.innerHTML = `
         <div class="content">
-            <h1><a href="/pages">${AC ? `WhereHentai`: `WhereAnime`}</a><span></span><a target="_blank"></a></h1>
+            <h1><a href="/WhereAnime/pages">${AC ? `WhereHentai`: `WhereAnime`}</a><span></span><a target="_blank"></a></h1>
             <nav>
                 <div id="searcher" class="hidden"><input type="text" placeholder="Buscar..."><button>🔎</button></div>
-                <a href="/pages">Inicio</a>
-                <a href="/search">Repositorio</a>
+                <a href="/WhereAnime/pages">Inicio</a>
+                <a href="/WhereAnime/search">Repositorio</a>
                 <div class="sub"><a>Paginas</a><div></div></div>
             </nav>
         </div>
@@ -39,7 +39,7 @@ function generateHeader() {
             if (title.toLowerCase() === "/enable-ac") { search = false; localStorage.setItem('ac', true); window.location.reload(); }
             if (title.toLowerCase() === "/switch-ac") { search = false; localStorage.setItem('ac', enableAC ? false : true); localStorage.setItem('allow-ac', enableAC); window.location.reload(); }
             if (title.toLowerCase() === "/disable-ac") { search = false; localStorage.setItem('ac', false); localStorage.setItem('allow-ac', false); window.location.reload(); }
-            if (search && title !== "") { window.location = `/search/?${database.config.page !== "all" ? `p=${database.config.page}&` : ""}q=${encodeURIComponent(title)}&n=1`; }
+            if (search && title !== "") { window.location = `/WhereAnime/search/?${database.config.page !== "all" ? `p=${database.config.page}&` : ""}q=${encodeURIComponent(title)}&n=1`; }
         }
         searcher.classList.toggle('hidden');
         searcher.querySelector('input').focus();
@@ -50,7 +50,7 @@ export function generatePagesHeader() {
     let AC = localStorage.getItem("ac") === "true";
     let pages = allowedPages[AC ? "AC": "NoAC"];
     generateHeader();
-    header.querySelector(`.content nav .sub > div`).innerHTML = Object.keys(pages).map(p => `<a href="/pages/?p=${pages[p]}">${p}</a>`).join("")
+    header.querySelector(`.content nav .sub > div`).innerHTML = Object.keys(pages).map(p => `<a href="/WhereAnime/pages/?p=${pages[p]}">${p}</a>`).join("")
 }
 export function generateSearchHeader() {
     let AC = localStorage.getItem("ac") === "true";
@@ -59,7 +59,7 @@ export function generateSearchHeader() {
     const q = params.get('q') || "";
     const n = params.get('n') || "";
     generateHeader();
-    header.querySelector(`.content nav .sub > div`).innerHTML = Object.keys(pages).map(p => `<a href="/search/?p=${pages[p]}${q !== "" ? `&q=${q}` : ``}${n > 1 ? `&n=${n}` : ``}">${p}</a>`).join("")
+    header.querySelector(`.content nav .sub > div`).innerHTML = Object.keys(pages).map(p => `<a href="/WhereAnime/search/?p=${pages[p]}${q !== "" ? `&q=${q}` : ``}${n > 1 ? `&n=${n}` : ``}">${p}</a>`).join("")
 }
 export function generateFooter() {
     footer.innerHTML = ``;
