@@ -29,12 +29,7 @@ database.config.ac = localStorage.getItem(`ac`) === "true";
 
 //#region Comportamiento
 async function main() {
-    if(param_query !== ""){
-        repository.parentElement.querySelector('h2').textContent = `Buscando '${param_query}'`
-    }else{
-        repository.parentElement.querySelector('h2').textContent = `Repositorio`
-    }
-    log(`param_query: ${param_query}`);
+    repository.parentElement.querySelector('h2').textContent = param_query !== "" ? `Buscando '${param_query}'` : `Repositorio`;
     const animes = database.findAnimesByTitle(param_query, "datetime", "desc");
     if (animes.length > 0) {
         repository.innerHTML = "";
@@ -63,7 +58,6 @@ async function main() {
                     navigator.innerHTML += `<a class="button" title="${title}" href="?${param_page !== "" ? `p=${param_page}&`: ""}${param_query !== "" ? `q=${encodeURI(param_query)}&`: ""}n=${value}">${text}</a>`
                 } else {
                     if(text !== cur){
-                        console.log(`<a title="${title}">${text}</a>`);
                         navigator.innerHTML += `<a title="${title}">${text}</a>`
                     }else{
                         navigator.innerHTML += `<a class="current" title="${title}">${text}</a>`

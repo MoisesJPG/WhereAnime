@@ -9,7 +9,7 @@ export class database {
     static #data = [];
     static async load() {
         try {
-            const res = await fetch('/WhereAnime/src/db/database.json');
+            const res = await fetch('/WhereAnime_database/database.json');
             const data = await res.json();
             this.#data = data;
             log(`La base de datos se ha cargado`);
@@ -27,6 +27,10 @@ export class database {
         return this.#data.find(anime => anime.id === id);
     }
     static findAnimesByTitle(title, sortBy = "title", order = "asc") {
+        function normalizeText(text) {
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+        title = normalizeText(title);
         try {
             let result = [];
             if(this.config.ac) {
@@ -35,14 +39,11 @@ export class database {
                 result = this.#getAnimesNoAC();
             }
             result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
-            
-            result = result.filter(anime => anime.titles.some(t => t.toLowerCase().includes(title.toLowerCase())))
-            console.log(result);
+            result = result.filter(anime => anime.titles.some(t => normalizeText(t).includes(title)))
             if (sortBy === "title" && order === "asc") result.sort((a,b) => a.titles[0].localeCompare(b.titles[0]));
             if (sortBy === "title" && order === "desc") result.sort((a,b) => b.titles[0].localeCompare(a.titles[0]));
             if (sortBy === "datetime" && order === "asc") result.sort((a,b) => a.datetime - b.datetime);
             if (sortBy === "datetime" && order === "desc") result.sort((a,b) => b.datetime - a.datetime);
-            console.log(result);
             return result;
         } catch (error) {
             console.error(error);

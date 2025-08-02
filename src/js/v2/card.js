@@ -11,7 +11,6 @@ export function generateCard(type, anime, episode, url, highlight) {
         p.page.toLowerCase() === (url ? url.page.toLowerCase() : database.config.page) ||
         database.config.page === "all"
     )[0].thumbnail;
-    console.log(thumbnail);
     let date = new Date(url ? url.time : (episode ? episode.datetime : anime.datetime)).toLocaleString().split(",")[0];
     /**/ let innerHTML = "";
     /*    */ innerHTML += `${url ? `<p class="page">${url.page}</p>` : ``}`

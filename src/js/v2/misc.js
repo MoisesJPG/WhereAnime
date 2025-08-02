@@ -42,13 +42,37 @@ export function generateNavigatorList(min, cur, max) {
     return pre.concat(lista).concat(sub);
 }
 export function highlightMatch(text, searchTitle) {
-    if (searchTitle) {
-        const escaped = searchTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapa caracteres especiales
-        const regex = new RegExp(escaped, 'gi'); // 'g' para global, 'i' para ignorar mayúsculas
-        return text.replace(regex, match => `<b>${match}</b>`);
+    if (!searchTitle) return text;
+
+    const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const normText = normalize(text);
+    const normSearch = normalize(searchTitle);
+
+    let result = '';
+    let i = 0;
+
+    while (i < text.length) {
+        let found = false;
+
+        for (let j = text.length; j > i; j--) {
+            const segment = text.slice(i, j);
+            if (normalize(segment).startsWith(normSearch)) {
+                result += '<b>' + segment.slice(0, searchTitle.length) + '</b>';
+                i += searchTitle.length;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            result += text[i];
+            i++;
+        }
     }
-    return text;
+
+    return result;
 }
+
 export function showAdultContentConfirm() {
     if (confirm('Estas apunto de activar el modo (+18) ¿Deseas continuar?')) {
         localStorage.setItem('allow-ac', true);
