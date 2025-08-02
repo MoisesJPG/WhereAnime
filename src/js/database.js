@@ -9,7 +9,12 @@ export class database {
     static #data = [];
     static async load() {
         try {
-            const res = await fetch('/WhereAnime_database/database.json');
+            let res = null;
+            if(window.location.host === "localhost") {
+                res = await fetch('/WhereAnime_database/database.json');
+            } else {
+                res = await fetch('https://raw.githubusercontent.com/MoisesJPG/WhereAnime_database/refs/heads/main/database.json');
+            }
             const data = await res.json();
             this.#data = data;
             log(`La base de datos se ha cargado`);
