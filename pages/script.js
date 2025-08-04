@@ -51,11 +51,10 @@ async function start() {
         return next.getTime() - now.getTime(); // tiempo restante en ms
     }
     await main();
-    let nextAt = getNextAlignedTime();
+    let nextAt = getNextAlignedTime()+60*1000;
     log(`Next update at ${new Date(Date.now() + nextAt).toLocaleString()}`);
     setTimeout(async () => {
         await main();
-        nextAt = getNextAlignedTime();
         log(`Next update at ${new Date(Date.now() + reloadDelay).toLocaleString()}`);
         setInterval(async () => {
             await main();

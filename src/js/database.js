@@ -6,6 +6,7 @@ export class database {
         ac: false,
         allow_ac: false
     }
+    static loaded = false;
     static #data = [];
     static async load() {
         try {
@@ -17,6 +18,7 @@ export class database {
             }
             const data = await res.json();
             this.#data = data;
+            this.loaded = true;
             log(`La base de datos se ha cargado`);
         } catch (err) {
             console.error('Error cargando JSON:', err);
@@ -65,6 +67,68 @@ export class database {
         result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
         result.sort((a, b) => b.datetime - a.datetime).slice(0, limit);
         return result.slice(0, limit);
+    }
+    
+    static V2_findAnimeByMainTitle(title) {
+        try {
+            let result = [];
+            if(this.config.ac) {
+                result = this.#getAnimesAC();
+            }else{
+                result = this.#getAnimesNoAC();
+            }
+            result = result.filter(anime => anime.titles[0] === title)[0];
+            return result;
+        } catch (error) {
+            console.error(error);
+            return []
+        }
+    }
+    static V2_getRecentEpisodes(limit = 20){
+        try {
+            const allEpisodes = this.#data.flatMap(anime => {                
+                if (this.config.ac && (anime.type.toLowerCase() === "unknown" || anime.type.toLowerCase() === "anime")) return [];
+                if (!this.config.ac && (anime.type.toLowerCase() === "hentai")) return [];
+                return anime.episodes.map(ep => {
+                    const filteredUrls = ep.urls.filter(url => url.page.toLowerCase() === this.config.page || this.config.page === "all");
+                    if (filteredUrls.length === 0) return null;
+                    return {
+                        animeId: anime.id,
+                        animeType: anime.type,
+                        thumbnail: anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail,
+                        title: anime.titles[0],
+                        episode: ep.episode,
+                        timestamp: ep.datetime,
+                        urls: filteredUrls
+                    };
+                });
+            }).filter(Boolean);
+            const sorted = allEpisodes.sort((a, b) => b.timestamp - a.timestamp);
+            return sorted.slice(0, limit);
+        } catch (err) {
+            console.error(err);
+            return [];
+        }
+    }
+    static V2_getRecentAnimes(limit = 20) {
+        let result = [];
+        if(this.config.ac) {
+            result = this.#getAnimesAC();
+        }else{
+            result = this.#getAnimesNoAC();
+        }
+        result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
+        result.sort((a, b) => b.datetime - a.datetime)
+        let response = result.slice(0, limit).map(anime => { return {
+            id: anime.id,
+            title: anime.titles[0],
+            type: anime.type,
+            thumbnail: anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail,
+            timestamp: anime.datetime,
+            episodeCount: anime.episodes.length,
+            otherTitles: anime.titles.slice(1)
+        }})
+        return response;
     }
     static getLastEpisodes(limit = 20) {
         try {

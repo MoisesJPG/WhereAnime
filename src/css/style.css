@@ -120,7 +120,7 @@ main {
 main section {
 
 }
-main section h2 {
+main section > h2 {
     position: sticky;
     padding: 16px 0;
     top: calc(64px);
@@ -141,13 +141,35 @@ main section .content {
     gap: 16px;
     padding-bottom: 64px;
 }
-main section .content h3 {
+main section .content > h3 {
     width: 100%;
     grid-column-start: 1;
     grid-column-end: 5;
     text-align: center;
     color: rgb(192,  128,  160);
 }
+main .content[name="anime"] section[name="animeData"] .content {
+    grid-template-columns: calc((100% - 16px * 3) / 4 * 1.5 + 16px) auto;
+    padding-top: 16px;
+}
+main .content[name="anime"] section[name="animeData"] .content .image {
+    width: calc(100% - 4px * 2);
+    aspect-ratio: 16 / 10;
+    align-items: center;
+    overflow: hidden;
+    border: 4px solid rgb( 80,  80,  96);
+    border-radius: 16px;
+}
+main .content[name="anime"] section[name="animeData"] .content .image img{
+    width: 100%;
+}
+main .content[name="anime"] section[name="animeData"] .content .data {
+    width: 100%;
+    padding: 8px 0;
+}
+main .content[name="anime"] section[name="animeData"] .content .data h2 { color: rgb(192, 224, 255); }
+main .content[name="anime"] section[name="animeData"] .content .data h3 { color: rgb(128, 160, 192); }
+main .content[name="anime"] section[name="animeData"] .content {}
 @media screen and (max-width: calc(256px * 4 + 16px * 3)) { main section .content { grid-template-columns: repeat(3, 1fr); } }
 @media screen and (max-width: calc(256px * 3 + 16px * 2)) { main section .content { grid-template-columns: repeat(2, 1fr); } }
 @media screen and (max-width: calc(256px * 2 + 16px * 1)) { main section .content { grid-template-columns: repeat(1, 1fr); } }
@@ -319,6 +341,29 @@ body:not(.ac) .card.hentai .hover     { filter: blur( 4px); z-index: 1; }
     background-color:rgb( 64, 128, 255);
 }
 
+#route {
+    color: white;
+    display: flex;
+    gap: 4px;
+    height: 16px;
+    font-size: 16px;
+    line-height: 16px;
+}
+#route span {
+    color: hsl(220, 100%, 63%);
+    font-weight: bold;
+}
+#route span.enable{}
+#route span.enable:hover {
+    cursor: pointer;
+    color: hsl(220, 100%, 75%);
+}
+#route span:not(:last-child)::after,
+#route span:only-child::after {
+    content: "/";
+    color: white;
+    padding-left: 4px;
+}
 /* ============= */
 /* === MODAL === */
 /* ============= */
