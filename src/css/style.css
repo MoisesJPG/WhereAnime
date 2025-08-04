@@ -129,7 +129,7 @@ main section > h2 {
     margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
-    z-index: 1;
+    z-index: 2;
 }
 main section#repository h2 {
     justify-content: start;
@@ -148,27 +148,59 @@ main section .content > h3 {
     text-align: center;
     color: rgb(192,  128,  160);
 }
-main .content[name="anime"] section[name="animeData"] .content {
+main .content[name="anime"] section[name="animeData"] .content,
+main .content[name="episode"] section[name="animeData"] .content {
     grid-template-columns: calc((100% - 16px * 3) / 4 * 1.5 + 16px) auto;
     padding-top: 16px;
 }
-main .content[name="anime"] section[name="animeData"] .content .image {
+main .content[name="anime"] section[name="animeData"] .content .image,
+main .content[name="episode"] section[name="animeData"] .content .image {
     width: calc(100% - 4px * 2);
     aspect-ratio: 16 / 10;
+    display: flex;
     align-items: center;
     overflow: hidden;
     border: 4px solid rgb( 80,  80,  96);
     border-radius: 16px;
 }
-main .content[name="anime"] section[name="animeData"] .content .image img{
+main .content[name="anime"] section[name="animeData"] .content .image img,
+main .content[name="episode"] section[name="animeData"] .content .image img {
     width: 100%;
+    min-height: 100%;
 }
-main .content[name="anime"] section[name="animeData"] .content .data {
+main .content[name="anime"] section[name="animeData"] .content .data,
+main .content[name="episode"] section[name="animeData"] .content .data { 
+    width: 100%;padding: 8px 0;
+}
+main .content[name="anime"] section[name="animeData"] .content .data h2,
+main .content[name="episode"] section[name="animeData"] .content .data h2 { 
+    color: rgb(192, 224, 255);
+}
+main .content[name="anime"] section[name="animeData"] .content .data hr,
+main .content[name="episode"] section[name="animeData"] .content .data hr { 
     width: 100%;
-    padding: 8px 0;
+    border: 0px solid rgb( 80,  80,  96);
+    border-top: 4px solid rgb( 80,  80,  96);
+    margin-top: 8px;
+    margin-bottom: 16px;
 }
-main .content[name="anime"] section[name="animeData"] .content .data h2 { color: rgb(192, 224, 255); }
-main .content[name="anime"] section[name="animeData"] .content .data h3 { color: rgb(128, 160, 192); }
+main .content[name="anime"] section[name="animeData"] .content .data h3,
+main .content[name="episode"] section[name="animeData"] .content .data h3 { 
+    color: rgb(128, 160, 192);
+    padding-bottom: 4px;
+}
+main .content[name="anime"] section[name="animeData"] .content.hentai .image img,
+main .content[name="episode"] section[name="animeData"] .content.hentai .image img {
+    filter: blur(16px); scale: 1.125;
+}
+main .content[name="anime"] section[name="animeData"] .content.hentai .data h2,
+main .content[name="episode"] section[name="animeData"] .content.hentai .data h2 {
+    filter: blur( 4px);
+}
+main .content[name="anime"] section[name="animeData"] .content.hentai .data h3,
+main .content[name="episode"] section[name="animeData"] .content.hentai .data h3 {
+    filter: blur( 4px);
+}
 main .content[name="anime"] section[name="animeData"] .content {}
 @media screen and (max-width: calc(256px * 4 + 16px * 3)) { main section .content { grid-template-columns: repeat(3, 1fr); } }
 @media screen and (max-width: calc(256px * 3 + 16px * 2)) { main section .content { grid-template-columns: repeat(2, 1fr); } }
@@ -278,6 +310,7 @@ main .content[name="anime"] section[name="animeData"] .content {}
 /* ============================= */
 /* === CARD VARIANT - HENTAI === */
 /* ============================= */
+body:not(.ac) .card.hentai .page      { display: none; } 
 body:not(.ac) .card.hentai .image img { filter: blur(16px); scale: 1.125; } 
 body:not(.ac) .card.hentai .title     { filter: blur( 4px); } 
 body:not(.ac) .card.hentai .episode   { filter: blur( 4px); } 
@@ -304,6 +337,7 @@ body:not(.ac) .card.hentai .hover     { filter: blur( 4px); z-index: 1; }
     width: 100%;
     max-width: calc(256px * 4 + 16px * 3);
     user-select: none;
+    z-index: 2;
 }
 .navigator .content {
     display: flex;
@@ -350,10 +384,13 @@ body:not(.ac) .card.hentai .hover     { filter: blur( 4px); z-index: 1; }
     line-height: 16px;
 }
 #route span {
+    font-weight: bold;
+    color: hsl(220, 25%, 50%);
+}
+#route span.enable{
     color: hsl(220, 100%, 63%);
     font-weight: bold;
 }
-#route span.enable{}
 #route span.enable:hover {
     cursor: pointer;
     color: hsl(220, 100%, 75%);

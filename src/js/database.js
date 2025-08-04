@@ -10,6 +10,8 @@ export class database {
     static #data = [];
     static async load() {
         try {
+            this.config.ac = localStorage.getItem("ac") === "true"? true: false;
+            this.config.allow_ac = localStorage.getItem("allow-ac") === "true"? true: false;
             let res = null;
             if(window.location.host === "localhost") {
                 res = await fetch('/WhereAnime_database/database.json', { cache: "no-store" });
@@ -79,6 +81,41 @@ export class database {
             }
             result = result.filter(anime => anime.titles[0] === title)[0];
             return result;
+        } catch (error) {
+            console.error(error);
+            return []
+        }
+    }
+    static V2_findAnimesByTitle(title, sortBy = "title", order = "asc") {
+        function normalizeText(text) {
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+        if(title !== ""){
+            title = normalizeText(title);
+        }
+        try {
+            let result = [];
+            if(this.config.ac) {
+                result = this.#getAnimesAC();
+            }else{
+                result = this.#getAnimesNoAC();
+            }
+            result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
+            result = result.filter(anime => anime.titles.some(t => normalizeText(t).includes(title)))
+            if (sortBy === "title" && order === "asc") result.sort((a,b) => a.titles[0].localeCompare(b.titles[0]));
+            if (sortBy === "title" && order === "desc") result.sort((a,b) => b.titles[0].localeCompare(a.titles[0]));
+            if (sortBy === "datetime" && order === "asc") result.sort((a,b) => a.datetime - b.datetime);
+            if (sortBy === "datetime" && order === "desc") result.sort((a,b) => b.datetime - a.datetime);
+            const response = result.map(anime => {return {
+                id: anime.id,
+                title: anime.titles[0],
+                otherTitles: anime.titles.slice(1),
+                type: anime.type,
+                thumbnail: anime.pages[0].thumbnail,
+                episodeCount: anime.episodes.length,
+                timestamp: anime.datetime
+            }})
+            return response;
         } catch (error) {
             console.error(error);
             return []
