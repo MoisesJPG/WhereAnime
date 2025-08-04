@@ -8,7 +8,7 @@ const mainContentSearch = document.querySelector('main .content[name="search"]')
 const searcher = header.querySelector(`#searcher`);
 
 const config = {
-    location: localStorage.getItem('location'),
+    location: localStorage.getItem('WhereAnime.location'),
     route: null,
     databaseLoaded: false,
     reloadDelay: 5 * 60 * 1000
@@ -56,7 +56,7 @@ function search() {
 function goTo(url) {
     const base = window.location.origin; // Base actual
     const newUrl = new URL(url, base);   // Construye URL absoluta
-    localStorage.setItem("location", url)
+    localStorage.setItem('WhereAnime.location', url)
     config.location = url
     let originalTitle = newUrl.pathname;
     let start = 0;
@@ -157,21 +157,11 @@ function highlightMatch(text, searchTitle) {
 let firstTimeHome = true;
 function prepareGoTo(newUrl = location) {
     // console.clear();
-    let AC = localStorage.getItem("ac") === "true";
+    let AC = localStorage.getItem('ac') === "true";
 
     function home() {
         const recentEpisodes = mainContentHome.querySelector('section[name="recentEpisodes"] .content');
         const recentAnimes = mainContentHome.querySelector('section[name="recentAnimes"] .content');
-        function getNextAlignedTime() {
-            const now = new Date();
-            const minutes = now.getMinutes();
-            const next = new Date(now);
-            const offset = (5 - ((minutes + 4) % 5)); // (ej. si estás en :00 → offset = 1)
-            next.setMinutes(minutes + offset);
-            next.setSeconds(0);
-            next.setMilliseconds(0);
-            return next.getTime() - now.getTime(); // tiempo restante en ms
-        }
         function refresh() {
             if (!database.loaded) { setTimeout(() => { refresh(); }, 1000); return; }
             const episodes = database.V2_getRecentEpisodes();
@@ -415,16 +405,16 @@ function prepareGoTo(newUrl = location) {
         mainContentSearch.style.display = "none";
     }
     function search() {
+        console.clear();
         const content = mainContentSearch.querySelector("section .content");
-        const page = parseInt(config.route[3]) || 1
-        const queryTitle = config.route[2] || "";
+        const page = (config.route.length === 3 ? parseInt(config.route[2]) : parseInt(config.route[3])) || 1
+        const queryTitle = (config.route.length === 3 ? "" : config.route[2]) || "";
         const animes = database.V2_findAnimesByTitle(queryTitle)
-        console.log(animes.length);
 
-        let i = 0;
         let itemCount = 20;
         if (page < 1) { goTo(`/WhereAnime/search/${queryTitle}`); return; }
-        if (page > Math.ceil(animes.length / itemCount)) { goTo(`/WhereAnime/search/${queryTitle}/${Math.ceil(animes.length / itemCount)}`); return; }
+        if (page > 1 && page > Math.ceil(animes.length / itemCount)) { goTo(`/WhereAnime/search/${queryTitle}/${Math.ceil(animes.length / itemCount)}`); return; }
+        let i = 0;
         for (let o = (page - 1) * itemCount; o < Math.min(page * itemCount, animes.length); o++, i++) {
             const anime = animes[o];
             const card = document.createElement("div");
@@ -446,6 +436,9 @@ function prepareGoTo(newUrl = location) {
             } else {
                 content.appendChild(card);
             }
+        }
+        for(let f = content.childElementCount - 1; f >= i; f--){
+            content.children[f].remove();
         }
 
         const navigator = mainContentSearch.parentElement.querySelector(".navigator .content");

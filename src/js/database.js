@@ -87,12 +87,14 @@ export class database {
         }
     }
     static V2_findAnimesByTitle(title, sortBy = "title", order = "asc") {
+        
         function normalizeText(text) {
             return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
         }
         if(title !== ""){
             title = normalizeText(title);
         }
+        console.log(title,sortBy,order);
         try {
             let result = [];
             if(this.config.ac) {
