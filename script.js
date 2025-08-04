@@ -252,6 +252,9 @@ function prepareGoTo(newUrl = location) {
         animeData.className = `content ${anime.type.toLowerCase()}`
         animeData.querySelector('.image img').src = anime.pages[0].thumbnail;
         animeData.querySelector('.title').textContent = anime.titles[0]
+        animeData.querySelector('.type').textContent = anime.type;
+        animeData.querySelector('.lang').textContent = anime.lang;
+        animeData.querySelector('.genres').innerHTML = `${anime.genres.length > 0 ? `<span>${anime.genres.join("</span><span>")}</span>`: `<span>Unknown</span>`}`;
         animeData.querySelector('.episodes').textContent = anime.episodes.length
         animeData.querySelector('.lastDate').textContent = new Date(anime.episodes[0].datetime).toLocaleDateString();
         animeData.querySelector('.firstDate').textContent = new Date(anime.datetime).toLocaleDateString();
@@ -278,7 +281,7 @@ function prepareGoTo(newUrl = location) {
                 <div class="hover">
                     <p>Titulo: ${anime.titles[0]}</p>
                     <p>Episodio: ${episode.episode}</p>
-                    <p>Fecha: ${new Date(anime.datetime).toLocaleDateString()}</p>
+                    <p>Fecha: ${new Date(episode.datetime).toLocaleDateString()}</p>
                 </div>
             `;
             let path = `/WhereAnime/episode/${anime.titles[0]}/${episode.episode}`;
@@ -471,15 +474,13 @@ function prepareGoTo(newUrl = location) {
         mainContentHome.style.display = "none";
         mainContentSearch.style.display = "";
     }
+
     let routeSearch = new URLSearchParams(newUrl.search);
-    console.log([...routeSearch]);
     config.route = `${newUrl.pathname}/${routeSearch.get("p") || ""}/${routeSearch.get("q") || ""}/${routeSearch.get("n") || ""}`.replaceAll("//", "/");
     while (config.route.includes("//")) { config.route = config.route.replaceAll("//", "/"); }
     while (config.route.endsWith("/")) { config.route = config.route.substring(0, config.route.length - 1); }
     while (config.route.startsWith("/")) { config.route = config.route.substring(1, config.route.length); }
     config.route = config.route.split("/");
-    console.log(config.route);
-
     if (config.route.length > 1) {
         switch (config.route[1]) {
             case "home": home(); break;
@@ -530,14 +531,11 @@ function prepareGoTo(newUrl = location) {
             else { path = `/${config.route.slice(0, i + 1).join("/")}`; }
         }
 
-        console.log(i, config.route, config.route.length - 1, path)
         if (path !== null) {
             e.classList.add('enable')
-            e.title = path;
             e.onclick = () => { goTo(path) }
         } else {
             e.classList.remove('enable');
-            e.title = null;
             e.onclick = null;
         }
     }

@@ -27,10 +27,15 @@ export class database {
         }
     }
     static #getAnimesAC(){
-        return this.#data.filter(anime => anime.type.toLowerCase() === "hentai");
+        return this.#data.filter(anime => (
+            anime.type.toLowerCase().split(" ")[0] === "hentai"
+        ));
     }
     static #getAnimesNoAC(){
-        return this.#data.filter(anime => (anime.type.toLowerCase() === "anime" || anime.type.toLowerCase() === "unknown"));
+        return this.#data.filter(anime => (
+            anime.type.toLowerCase().split(" ")[0] === "anime" || 
+            anime.type.toLowerCase().split(" ")[0] === "unknown"
+        ));
     }
     static findAnimeById(id) {
         return this.#data.find(anime => anime.id === id);

@@ -186,8 +186,32 @@ main .content[name="episode"] section[name="animeData"] .content .data hr {
 }
 main .content[name="anime"] section[name="animeData"] .content .data h3,
 main .content[name="episode"] section[name="animeData"] .content .data h3 { 
+    min-height: 20px;
+    font-size: 20px;
     color: rgb(128, 160, 192);
     padding-bottom: 4px;
+}
+main .content[name="anime"] section[name="animeData"] .content .data h3 span,
+main .content[name="episode"] section[name="animeData"] .content .data h3 span {
+    display: inline-block; 
+    height: 20px;
+    font-size: 20px;
+}
+main .content[name="anime"] section[name="animeData"] .content .data h3 .genres ,
+main .content[name="episode"] section[name="animeData"] .content .data h3 .genres  {
+    display: flex;
+    padding-top: 4px;
+    gap: 8px;
+}
+main .content[name="anime"] section[name="animeData"] .content .data h3 .genres span ,
+main .content[name="episode"] section[name="animeData"] .content .data h3 .genres span {
+    padding: 4px 8px;
+    border-radius: 8px;
+    background-color: rgb(032, 064, 096);
+    height: 16px;
+    font-size: 16px;
+    line-height: 16px;
+    text-transform: uppercase;
 }
 main .content[name="anime"] section[name="animeData"] .content.hentai .image img,
 main .content[name="episode"] section[name="animeData"] .content.hentai .image img {
