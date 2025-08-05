@@ -3,8 +3,20 @@
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
 }
-body {
+*:focus {
+    outline: 0;
+}
+html {
     background: rgb(16,16,24);
+    min-height: 100vh;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+}
+body {
+    background: rgb(16,16,24,0.9875);
+    min-height: 100vh;
 }
 
 /* ============== */
@@ -116,6 +128,8 @@ main {
     max-width: calc(256px * 4 + 16px * 3);
     margin: auto;
     padding-top: 0;
+    /* background-color: rgb( 16,  16,  24); */
+    min-height: calc(100vh - 64px - 16px);
 }
 main section {
 
@@ -134,7 +148,7 @@ main section > h2 {
 main section#repository h2 {
     justify-content: start;
 }
-main section .content {
+main section > .content {
     display: grid;
     flex-wrap: wrap;
     grid-template-columns: repeat(4, 1fr);
@@ -150,23 +164,24 @@ main section .content > h3 {
 }
 main .content[name="anime"] section[name="animeData"] .content,
 main .content[name="episode"] section[name="animeData"] .content {
-    grid-template-columns: calc((100% - 16px * 3) / 4 * 1.5 + 16px) auto;
+    grid-template-columns: calc((100% - 16px * 3) / 4) auto;
     padding-top: 16px;
 }
 main .content[name="anime"] section[name="animeData"] .content .image,
 main .content[name="episode"] section[name="animeData"] .content .image {
     width: calc(100% - 4px * 2);
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 10 / 16;
     display: flex;
     align-items: center;
     overflow: hidden;
     border: 4px solid rgb( 80,  80,  96);
     border-radius: 16px;
+    flex-direction: column;
 }
 main .content[name="anime"] section[name="animeData"] .content .image img,
 main .content[name="episode"] section[name="animeData"] .content .image img {
-    width: 100%;
-    min-height: 100%;
+    height: 100%;
+    min-width: 100%;
 }
 main .content[name="anime"] section[name="animeData"] .content .data,
 main .content[name="episode"] section[name="animeData"] .content .data { 
@@ -225,10 +240,77 @@ main .content[name="anime"] section[name="animeData"] .content.hentai .data h3,
 main .content[name="episode"] section[name="animeData"] .content.hentai .data h3 {
     filter: blur( 4px);
 }
+
+
+
+main .content[name="search"] section[name="filter"] p,
+main .content[name="search"] section[name="filter"] details summary {
+    width: 100%;
+    font-size: 16px;
+    color: rgb(128, 160, 255);
+    font-weight: bold;
+}
+main .content[name="search"] section[name="filter"] input[type="text"] {
+    height: 12px;
+    font-size: 12px;
+    line-height: 12px;
+    color: rgb( 64,  96, 128);
+    padding: 4px 8px;
+    border: 2px solid red;
+    border-radius: 4px;
+}
+main .content[name="search"] section[name="filter"] button {
+    font-size: 12px;
+    height: 24px;
+    line-height: 4px;
+    padding: 8px 16px;
+    border: 2px solid red;
+    border-radius: 4px;
+    color: rgb( 64,  96, 128);
+    font-weight: bold;
+}
+main .content[name="search"] section[name="filter"] details .content {
+    max-height: calc(16px * 8);
+    padding-right: 8px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+main .content[name="search"] section[name="filter"] details .content p {
+    display: flex;
+    gap: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid white;
+    height: 13px;
+    font-size: 13px;
+    line-height: 13px;
+}
+main .content[name="search"] section[name="filter"] nav > .row input[type="text"] {
+    width: calc(100% - 105px);
+}
+main .content[name="search"] section[name="filter"] .rows {
+    display: flex;
+    flex-direction: column;
+}
+main .content[name="search"] section[name="filter"] .rows .row {
+    padding: 8px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 8px;
+}
+main .content[name="search"] section[name="filter"] .cols {
+    display: flex;
+    flex-direction: row;
+}
+main .content[name="search"] section[name="filter"] .cols .col {
+    padding: 8px;
+}
+main .content[name="search"] section[name="filter"] nav {}
 main .content[name="anime"] section[name="animeData"] .content {}
-@media screen and (max-width: calc(256px * 4 + 16px * 3)) { main section .content { grid-template-columns: repeat(3, 1fr); } }
-@media screen and (max-width: calc(256px * 3 + 16px * 2)) { main section .content { grid-template-columns: repeat(2, 1fr); } }
-@media screen and (max-width: calc(256px * 2 + 16px * 1)) { main section .content { grid-template-columns: repeat(1, 1fr); } }
+@media screen and (max-width: calc(256px * 4 + 16px * 3)) { main section > .content { grid-template-columns: repeat(3, 1fr); } }
+@media screen and (max-width: calc(256px * 3 + 16px * 2)) { main section > .content { grid-template-columns: repeat(2, 1fr); } }
+@media screen and (max-width: calc(256px * 2 + 16px * 1)) { main section > .content { grid-template-columns: repeat(1, 1fr); } }
 
 /* ============= */
 /* === CARDS === */

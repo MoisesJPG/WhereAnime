@@ -92,13 +92,7 @@ export class database {
         }
     }
     static V2_findAnimesByTitle(title, sortBy = "title", order = "asc") {
-        
-        function normalizeText(text) {
-            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-        }
-        if(title !== ""){
-            title = normalizeText(title);
-        }
+        title = decodeURIComponent(title);
         console.log(title,sortBy,order);
         try {
             let result = [];
@@ -108,7 +102,7 @@ export class database {
                 result = this.#getAnimesNoAC();
             }
             result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
-            result = result.filter(anime => anime.titles.some(t => normalizeText(t).includes(title)))
+            result = result.filter(anime => anime.titles.some(t => t.includes(title)))
             if (sortBy === "title" && order === "asc") result.sort((a,b) => a.titles[0].localeCompare(b.titles[0]));
             if (sortBy === "title" && order === "desc") result.sort((a,b) => b.titles[0].localeCompare(a.titles[0]));
             if (sortBy === "datetime" && order === "asc") result.sort((a,b) => a.datetime - b.datetime);
@@ -130,9 +124,13 @@ export class database {
     }
     static V2_getRecentEpisodes(limit = 20){
         try {
-            const allEpisodes = this.#data.flatMap(anime => {                
-                if (this.config.ac && (anime.type.toLowerCase() === "unknown" || anime.type.toLowerCase() === "anime")) return [];
-                if (!this.config.ac && (anime.type.toLowerCase() === "hentai")) return [];
+            let result = [];
+            if(this.config.ac) {
+                result = this.#getAnimesAC();
+            }else{
+                result = this.#getAnimesNoAC();
+            }
+            const allEpisodes = result.flatMap(anime => {
                 return anime.episodes.map(ep => {
                     const filteredUrls = ep.urls.filter(url => url.page.toLowerCase() === this.config.page || this.config.page === "all");
                     if (filteredUrls.length === 0) return null;

@@ -25,6 +25,7 @@ function search() {
     if (!searcher.classList.contains('hidden')) {
         let title = searcher.querySelector('input').value;
         title.replaceAll("#", "%25")
+        title.replaceAll("?", "%3F")
         if (title.toLowerCase() === "/enable-ac") {
             localStorage.setItem('ac', true);
             database.config.ac = true;
@@ -126,9 +127,8 @@ function generateNavigatorList(min, cur, max) {
 function highlightMatch(text, searchTitle) {
     if (!searchTitle) return text;
 
-    const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const normText = normalize(text);
-    const normSearch = normalize(searchTitle);
+    const normText = text;
+    const normSearch = searchTitle;
 
     let result = '';
     let i = 0;
@@ -138,7 +138,7 @@ function highlightMatch(text, searchTitle) {
 
         for (let j = text.length; j > i; j--) {
             const segment = text.slice(i, j);
-            if (normalize(segment).startsWith(normSearch)) {
+            if (segment.startsWith(normSearch)) {
                 result += '<b>' + segment.slice(0, searchTitle.length) + '</b>';
                 i += searchTitle.length;
                 found = true;
@@ -157,9 +157,8 @@ function highlightMatch(text, searchTitle) {
 let firstTimeHome = true;
 function prepareGoTo(newUrl = location) {
     // console.clear();
-    let AC = localStorage.getItem('ac') === "true";
-
     function home() {
+        document.documentElement.style.backgroundImage = ``;
         const recentEpisodes = mainContentHome.querySelector('section[name="recentEpisodes"] .content');
         const recentAnimes = mainContentHome.querySelector('section[name="recentAnimes"] .content');
         function refresh() {
@@ -179,8 +178,7 @@ function prepareGoTo(newUrl = location) {
                         <p>Fecha: ${new Date(episode.timestamp).toLocaleDateString()}</p>
                     </div>
                 `;
-                let path = `/WhereAnime/episode/${episode.title}/${episode.episode}`;
-                card.onclick = () => goTo(path)
+                card.onclick = () => goTo(`/WhereAnime/episode/${encodeURIComponent(episode.title)}/${episode.episode}`)
                 if (recentEpisodes.children[i]) {
                     recentEpisodes.replaceChild(card, recentEpisodes.children[i]);
                 } else {
@@ -203,7 +201,7 @@ function prepareGoTo(newUrl = location) {
                         ${anime.otherTitles.length > 0 ? `<p>Otros titulos:<br> - ${anime.otherTitles.join("<br> - ")}</p>` : ""}
                     </div>
                 `;
-                let path = `/WhereAnime/anime/${anime.title}`;
+                let path = `/WhereAnime/anime/${encodeURIComponent(anime.title)}`;
                 card.onclick = () => goTo(path)
                 if (recentAnimes.children[i]) {
                     recentAnimes.replaceChild(card, recentAnimes.children[i]);
@@ -229,9 +227,7 @@ function prepareGoTo(newUrl = location) {
         
         const delay = 5 * 60 * 1000;
         const now = Date.now() - 2 * 60 * 1000 - 1000;
-        const rem = delay - (now % delay);
-        console.log(rem);
-        
+        const rem = delay - (now % delay);       
         intervals["homeRecentFirstRefresh"] = setTimeout(() => {
             refresh();
             intervals["homeRecentLoopRefresh"] = setInterval(() => {
@@ -239,6 +235,7 @@ function prepareGoTo(newUrl = location) {
             }, config.reloadDelay);
         }, rem);
         mainContentAnime.style.display = "none";
+        mainContentEpisode.style.display = "none";
         mainContentHome.style.display = "";
         mainContentSearch.style.display = "none";
     }
@@ -248,10 +245,12 @@ function prepareGoTo(newUrl = location) {
         const animeTitle = decodeURIComponent(config.route[2]);
         const anime = database.V2_findAnimeByMainTitle(animeTitle)
         if (!anime) { goTo("/WhereAnime"); return; }
+        document.documentElement.style.backgroundImage = `url(${anime.pages[0].thumbnail})`;
         const animeData = mainContentAnime.querySelector('section[name="animeData"] .content')
         animeData.className = `content ${anime.type.toLowerCase()}`
         animeData.querySelector('.image img').src = anime.pages[0].thumbnail;
         animeData.querySelector('.title').textContent = anime.titles[0]
+        animeData.querySelector('.status').textContent = anime.status;
         animeData.querySelector('.type').textContent = anime.type;
         animeData.querySelector('.lang').textContent = anime.lang;
         animeData.querySelector('.genres').innerHTML = `${anime.genres.length > 0 ? `<span>${anime.genres.join("</span><span>")}</span>`: `<span>Unknown</span>`}`;
@@ -266,8 +265,8 @@ function prepareGoTo(newUrl = location) {
         }
         const episodeList = mainContentAnime.querySelector('section[name="episodeList"] .content')
         let itemCount = 8;
-        if (page < 1) { goTo(`/WhereAnime/anime/${animeTitle}/1`); return; }
-        if (page > Math.ceil(anime.episodes.length / itemCount)) { goTo(`/WhereAnime/anime/${animeTitle}/${Math.ceil(anime.episodes.length / itemCount)}`); return; }
+        if (page < 1) { goTo(`/WhereAnime/anime/${encodeURIComponent(animeTitle)}/1`); return; }
+        if (page > Math.ceil(anime.episodes.length / itemCount)) { goTo(`/WhereAnime/anime/${encodeURIComponent(animeTitle)}/${Math.ceil(anime.episodes.length / itemCount)}`); return; }
         episodeList.parentElement.querySelector('h2').textContent = `Lista de episodios - Pag. ${page}/${Math.ceil(anime.episodes.length / itemCount)}`;
         let i = 0;
         for (let o = (page - 1) * itemCount; o < Math.min(page * itemCount, anime.episodes.length); o++, i++) {
@@ -284,8 +283,7 @@ function prepareGoTo(newUrl = location) {
                     <p>Fecha: ${new Date(episode.datetime).toLocaleDateString()}</p>
                 </div>
             `;
-            let path = `/WhereAnime/episode/${anime.titles[0]}/${episode.episode}`;
-            card.onclick = () => goTo(path)
+            card.onclick = () => goTo(`/WhereAnime/episode/${encodeURIComponent(anime.titles[0])}/${episode.episode}`)
             if (episodeList.children[i]) {
                 episodeList.replaceChild(card, episodeList.children[i]);
             } else {
@@ -331,10 +329,11 @@ function prepareGoTo(newUrl = location) {
         const animeTitle = decodeURIComponent(config.route[2]);
         const anime = database.V2_findAnimeByMainTitle(animeTitle)
         if (!anime) { goTo("/WhereAnime"); return; }
+        document.documentElement.style.backgroundImage = `url(${anime.pages[0].thumbnail})`;
         const episode = anime.episodes.filter(e => e.episode === parseFloat(config.route[3]))[0];
         const animeData = mainContentEpisode.querySelector('section[name="animeData"] .content')
         animeData.className = `content ${anime.type.toLowerCase()}`
-        animeData.querySelector('.image').onclick = () => goTo(`/WhereAnime/anime/${animeTitle}`);
+        animeData.querySelector('.image').onclick = () => goTo(`/WhereAnime/anime/${encodeURIComponent(animeTitle)}`);
         animeData.querySelector('.image img').src = anime.pages[0].thumbnail;
         animeData.querySelector('.title').textContent = anime.titles[0]
         animeData.querySelector('.episode').textContent = episode.episode;
@@ -348,8 +347,8 @@ function prepareGoTo(newUrl = location) {
         const episodeLinks = mainContentEpisode.querySelector('section[name="episodeLinks"] .content')
         let i = 0;
         let itemCount = 8;
-        if (page < 1) { goTo(`/WhereAnime/episode/${animeTitle}/1`); return; }
-        if (page > Math.ceil(anime.episodes.length / itemCount)) { goTo(`/WhereAnime/episode/${animeTitle}/${Math.ceil(episode.urls.length / itemCount)}`); return; }
+        if (page < 1) { goTo(`/WhereAnime/episode/${encodeURIComponent(animeTitle)}/1`); return; }
+        if (page > Math.ceil(anime.episodes.length / itemCount)) { goTo(`/WhereAnime/episode/${encodeURIComponent(animeTitle)}/${Math.ceil(episode.urls.length / itemCount)}`); return; }
         for (let o = (page - 1) * itemCount; o < Math.min(page * itemCount, episode.urls.length); o++, i++) {
             const url = episode.urls[o];
             const card = document.createElement("div");
@@ -408,8 +407,8 @@ function prepareGoTo(newUrl = location) {
         mainContentSearch.style.display = "none";
     }
     function search() {
-        console.clear();
-        const content = mainContentSearch.querySelector("section .content");
+        document.documentElement.style.backgroundImage = ``;
+        const content = mainContentSearch.querySelector(`section[name="results"] .content`);
         const page = (config.route.length === 3 ? parseInt(config.route[2]) : parseInt(config.route[3])) || 1
         const queryTitle = (config.route.length === 3 ? "" : config.route[2]) || "";
         const animes = database.V2_findAnimesByTitle(queryTitle)
@@ -424,16 +423,15 @@ function prepareGoTo(newUrl = location) {
             card.className = `card ${anime.type.toLowerCase()}`
             card.innerHTML = `
                 <div class="image"><img src="${anime.thumbnail}" alt="${anime.title}"></div>
-                <p class="title">${highlightMatch(anime.title, queryTitle)}</p>
+                <p class="title">${highlightMatch(anime.title, decodeURIComponent(queryTitle))}</p>
                 <div class="hover">
-                    <p>Titulo: ${highlightMatch(anime.title, queryTitle)}</p>
+                    <p>Titulo: ${highlightMatch(anime.title, decodeURIComponent(queryTitle))}</p>
                     <p>Episodios: ${anime.episodeCount}</p>
                     <p>Fecha: ${new Date(anime.timestamp).toLocaleDateString()}</p>
-                    ${anime.otherTitles.length > 0 ? `<p>Otros titulos:<br> - ${highlightMatch(anime.otherTitles.join("<br> - "), queryTitle)}</p>` : ""}
+                    ${anime.otherTitles.length > 0 ? `<p>Otros titulos:<br> - ${highlightMatch(anime.otherTitles.join("<br> - "), decodeURIComponent(queryTitle))}</p>` : ""}
                 </div>
             `;
-            let path = `/WhereAnime/anime/${anime.title}`;
-            card.onclick = () => goTo(path)
+            card.onclick = () => goTo(`/WhereAnime/anime/${encodeURIComponent(anime.title)}`)
             if (content.children[i]) {
                 content.replaceChild(card, content.children[i]);
             } else {
@@ -476,11 +474,21 @@ function prepareGoTo(newUrl = location) {
     }
 
     let routeSearch = new URLSearchParams(newUrl.search);
-    config.route = `${newUrl.pathname}/${routeSearch.get("p") || ""}/${routeSearch.get("q") || ""}/${routeSearch.get("n") || ""}`.replaceAll("//", "/");
+    let routePath = newUrl.href;
+    routePath = routePath.substring(newUrl.origin.length, routePath.length)
+    if(routePath.includes("?")){
+        if(routePath.indexOf("?") === routePath.lastIndexOf("?")){
+            routePath = routePath.substring(0, routePath.lastIndexOf("?"))
+        }
+    }
+    
+    config.route = `${routePath}/${routeSearch.get("p") || ""}/${encodeURIComponent(routeSearch.get("q") || "")}/${routeSearch.get("n") || ""}`;
+    
     while (config.route.includes("//")) { config.route = config.route.replaceAll("//", "/"); }
     while (config.route.endsWith("/")) { config.route = config.route.substring(0, config.route.length - 1); }
     while (config.route.startsWith("/")) { config.route = config.route.substring(1, config.route.length); }
     config.route = config.route.split("/");
+    
     if (config.route.length > 1) {
         switch (config.route[1]) {
             case "home": home(); break;
@@ -544,9 +552,6 @@ function prepareGoTo(newUrl = location) {
     }
 
 }
-setTimeout(() => {
-    // loadDatabase();
-}, 1000);
 document.addEventListener('DOMContentLoaded', async () => {
     // Header
     header.querySelector('.content h1').onclick = () => goTo('/WhereAnime');
