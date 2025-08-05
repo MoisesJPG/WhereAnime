@@ -1,4 +1,6 @@
+import { AdvancedSearcher } from "./advancedSearcher.js";
 import { database } from "./src/js/database.js";
+
 const header = document.querySelector('header');
 const main = document.querySelector('main');
 const mainContentAnime = document.querySelector('main .content[name="anime"]');
@@ -6,54 +8,19 @@ const mainContentEpisode = document.querySelector('main .content[name="episode"]
 const mainContentHome = document.querySelector('main .content[name="home"]');
 const mainContentSearch = document.querySelector('main .content[name="search"]');
 const searcher = header.querySelector(`#searcher`);
+const advancedSearcher = document.querySelector(`#advancedSearcher`);
 
 const config = {
     location: localStorage.getItem('WhereAnime.location'),
     route: null,
-    databaseLoaded: false,
     reloadDelay: 5 * 60 * 1000
 };
 
-
 async function loadDatabase() {
     await database.load();
-    config.databaseLoaded = true;
+    AdvancedSearcher.inizialiceFilter();
 }
-loadDatabase();
 const intervals = {}
-function search() {
-    if (!searcher.classList.contains('hidden')) {
-        let title = searcher.querySelector('input').value;
-        title.replaceAll("#", "%25")
-        title.replaceAll("?", "%3F")
-        if (title.toLowerCase() === "/enable-ac") {
-            localStorage.setItem('ac', true);
-            database.config.ac = true;
-            goTo(config.location);
-            return;
-        }
-        if (title.toLowerCase() === "/switch-ac") {
-            database.config.ac = !database.config.ac;
-            localStorage.setItem('ac', database.config.ac);
-            localStorage.setItem('allow-ac', false);
-            goTo(config.location);
-            return;
-        }
-        if (title.toLowerCase() === "/disable-ac") {
-            database.config.ac = false;
-            localStorage.setItem('ac', false);
-            localStorage.setItem('allow-ac', false);
-            goTo(config.location);
-            return;
-        }
-        if (title !== "") {
-            searcher.querySelector('input').value = "";
-            goTo(`/WhereAnime/search/?${database.config.page !== "all" ? `p=${database.config.page}&` : ""}q=${encodeURIComponent(title)}&n=1`);
-        }
-    }
-    searcher.classList.toggle('hidden');
-    searcher.querySelector('input').focus();
-}
 function goTo(url) {
     const base = window.location.origin; // Base actual
     const newUrl = new URL(url, base);   // Construye URL absoluta
@@ -89,6 +56,7 @@ function goTo(url) {
     prepareGoTo(newUrl);
 }
 function generateNavigatorList(min, cur, max) {
+    max = Math.max(1, max)
     const pre = [{ text: "<<", value: min }, { text: "<", value: cur - 1 < min ? min : cur - 1 }]
     const sub = [{ text: ">", value: cur + 1 > max ? max : cur + 1 }, { text: ">>", value: max }]
     const total = max - min + 1;
@@ -156,7 +124,6 @@ function highlightMatch(text, searchTitle) {
 }
 let firstTimeHome = true;
 function prepareGoTo(newUrl = location) {
-    // console.clear();
     function home() {
         document.documentElement.style.backgroundImage = ``;
         const recentEpisodes = mainContentHome.querySelector('section[name="recentEpisodes"] .content');
@@ -245,17 +212,47 @@ function prepareGoTo(newUrl = location) {
         const animeTitle = decodeURIComponent(config.route[2]);
         const anime = database.V2_findAnimeByMainTitle(animeTitle)
         if (!anime) { goTo("/WhereAnime"); return; }
-        document.documentElement.style.backgroundImage = `url(${anime.pages[0].thumbnail})`;
+        document.documentElement.style.backgroundImage = `url(${anime.pages.length > 0 ? anime.pages[0].thumbnail : ""})`;
         const animeData = mainContentAnime.querySelector('section[name="animeData"] .content')
         animeData.className = `content ${anime.type.toLowerCase()}`
-        animeData.querySelector('.image img').src = anime.pages[0].thumbnail;
+        animeData.querySelector('.image img').src = anime.pages.length > 0 ? anime.pages[0].thumbnail : "";
         animeData.querySelector('.title').textContent = anime.titles[0]
         animeData.querySelector('.status').textContent = anime.status;
+        animeData.querySelector('.status').onclick = () => {
+            AdvancedSearcher.resetFilter();
+            AdvancedSearcher.setFilter("status", anime.status, true)
+            goTo("/WhereAnime/search/1")
+        }
         animeData.querySelector('.type').textContent = anime.type;
+        animeData.querySelector('.type').onclick = () => {
+            AdvancedSearcher.resetFilter();
+            AdvancedSearcher.setFilter("types", anime.type, true)
+            goTo("/WhereAnime/search/1")
+        }
         animeData.querySelector('.lang').textContent = anime.lang;
-        animeData.querySelector('.genres').innerHTML = `${anime.genres.length > 0 ? `<span>${anime.genres.join("</span><span>")}</span>`: `<span>Unknown</span>`}`;
+        animeData.querySelector('.lang').onclick = () => {
+            AdvancedSearcher.resetFilter();
+            AdvancedSearcher.setFilter("langs", anime.lang, true)
+            goTo("/WhereAnime/search/1")
+        }
+        animeData.querySelector('.genres').innerHTML = "";
+        if(anime.genres.length > 0){
+            animeData.querySelector('.genres').parentElement.querySelector("span").textContent = `Generos:`;
+            for(const genre of anime.genres){
+                const span = document.createElement("span");
+                span.textContent = genre;
+                span.onclick = () => {
+                    AdvancedSearcher.resetFilter();
+                    AdvancedSearcher.setFilter("genres", genre, true)
+                    goTo("/WhereAnime/search/1")
+                }
+                animeData.querySelector('.genres').appendChild(span);
+            }
+        }else{
+            animeData.querySelector('.genres').parentElement.querySelector("span").textContent = `Generos: Ninguno.`;
+        }
         animeData.querySelector('.episodes').textContent = anime.episodes.length
-        animeData.querySelector('.lastDate').textContent = new Date(anime.episodes[0].datetime).toLocaleDateString();
+        animeData.querySelector('.lastDate').textContent = new Date(anime.episodes.length > 0 ? anime.episodes[0].datetime : 0).toLocaleDateString();
         animeData.querySelector('.firstDate').textContent = new Date(anime.datetime).toLocaleDateString();
         if (anime.titles.slice(1).length > 0) {
             animeData.querySelector('.otherTitles').innerHTML = ` - ${anime.titles.slice(1).join("<br> - ")}`;
@@ -411,7 +408,12 @@ function prepareGoTo(newUrl = location) {
         const content = mainContentSearch.querySelector(`section[name="results"] .content`);
         const page = (config.route.length === 3 ? parseInt(config.route[2]) : parseInt(config.route[3])) || 1
         const queryTitle = (config.route.length === 3 ? "" : config.route[2]) || "";
-        const animes = database.V2_findAnimesByTitle(queryTitle)
+        
+        AdvancedSearcher.filter.title = decodeURIComponent(queryTitle);
+        mainContentSearch.querySelector('section[name="filter"] nav [name="title"] input').value = decodeURIComponent(queryTitle);
+        AdvancedSearcher.prepare();
+
+        const animes = AdvancedSearcher.getAnimes();
 
         let itemCount = 20;
         if (page < 1) { goTo(`/WhereAnime/search/${queryTitle}`); return; }
@@ -555,27 +557,60 @@ function prepareGoTo(newUrl = location) {
 document.addEventListener('DOMContentLoaded', async () => {
     // Header
     header.querySelector('.content h1').onclick = () => goTo('/WhereAnime');
-    header.querySelector('.content nav a[name="index"]').onclick = () => goTo('/WhereAnime');
-    header.querySelector('.content nav a[name="repository"]').onclick = () => goTo('/WhereAnime/search');
-    searcher.querySelector('input').onkeydown = (event) => { if (event.key === "Enter") { search(); } }
-    searcher.querySelector('button').onclick = () => { search(); }
-    for (let index = 0; index < 19; index++) {
-        mainContentHome.querySelector('section[name="recentEpisodes"] .content').innerHTML += `
-            <div class="card anime">
-                <div class="image">
-                    <img src="" alt="">
-                </div>
-            </div>
-        `;
-        mainContentHome.querySelector('section[name="recentAnimes"] .content').innerHTML += `
-            <div class="card anime">
-                <div class="image">
-                    <img src="" alt="">
-                </div>
-            </div>
-        `;
-
+    header.querySelector('.content nav a[name="index"]').onclick = () => { goTo('/WhereAnime'); };
+    header.querySelector('.content nav a[name="repository"]').onclick = () => { AdvancedSearcher.resetFilter(); goTo('/WhereAnime/search'); };
+    searcher.querySelector('input').onkeydown = (event) => { if (event.key === "Enter") { headerSearcher(); } }
+    searcher.querySelector('button').onclick = () => { headerSearcher(); }
+    async function headerSearcher() {
+        if (!searcher.classList.contains('hidden')) {
+            let title = searcher.querySelector('input').value;
+            title.replaceAll("#", "%25")
+            title.replaceAll("?", "%3F")
+            if (title.toLowerCase() === "/enable-ac") {
+                localStorage.setItem('ac', true);
+                database.config.AC = true;
+                await loadDatabase();
+                goTo(config.location);
+                return;
+            }
+            if (title.toLowerCase() === "/switch-ac") {
+                database.config.AC = !database.config.AC;
+                localStorage.setItem('ac', database.config.AC);
+                localStorage.setItem('allow-ac', false);
+                await loadDatabase()
+                goTo(config.location);
+                return;
+            }
+            if (title.toLowerCase() === "/disable-ac") {
+                database.config.AC = false;
+                localStorage.setItem('ac', false);
+                localStorage.setItem('allow-ac', false);
+                await loadDatabase()
+                goTo(config.location);
+                return;
+            }
+            if (title !== "") {
+                AdvancedSearcher.resetFilter();
+                searcher.querySelector('input').value = "";
+                goTo(`/WhereAnime/search/?${database.config.page !== "all" ? `p=${database.config.page}&` : ""}q=${encodeURIComponent(title)}&n=1`);
+            }
+        }
+        searcher.classList.toggle('hidden');
+        searcher.querySelector('input').focus();
     }
+    advancedSearcher.querySelector('[name="title"] input').onkeydown = (e) => { if (e.key === "Enter") { advancedSearch(); } }
+    advancedSearcher.querySelector('[name="title"] button').onclick = () => { advancedSearch(); }
+    function advancedSearch() {
+        let title = advancedSearcher.querySelector('[name="title"] input').value;
+        goTo(`/WhereAnime/search/?q=${encodeURIComponent(title)}&n=1`);
+    }
+    // Home page
+    for (let index = 0; index < 19; index++) {
+        mainContentHome.querySelector('section[name="recentEpisodes"] .content').innerHTML += `<div class="card anime"><div class="image"><img src="" alt=""></div></div>`;
+        mainContentHome.querySelector('section[name="recentAnimes"] .content').innerHTML += `<div class="card anime"><div class="image"><img src="" alt=""></div></div>`;
+    }
+    
+    // Last step
     await loadDatabase();
     goTo(config.location || `/WhereAnime`)
 })

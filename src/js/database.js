@@ -3,133 +3,70 @@ import { log } from "./v2/misc.js";
 export class database {
     static config = {
         page: "all",
-        ac: false,
-        allow_ac: false
+        AC: false,
+        ACMode: "NoAC",
+        allowAC: false
+    }
+
+    static V2_getFilters() {
+        const filters = {
+            title: "", 
+            types: { AC: {}, NoAC: {}},
+            genres: { AC: {}, NoAC: {}},
+            langs : { AC: {}, NoAC: {}},
+            status: { AC: {}, NoAC: {}},
+            years : { AC: {}, NoAC: {}}
+        };
+        for (const anime of this.#data) {
+            let type = anime.type.toLowerCase().split(" ")[0] === "hentai" ? "AC" : "NoAC"
+            filters.types[type][anime.type] = filters.types[type][anime.type] || false;
+            filters.langs[type][anime.lang] = filters.langs[type][anime.lang] || false;
+            filters.status[type][anime.status] = filters.status[type][anime.status] || false;
+            filters.years[type][new Date(anime.datetime).getFullYear()] = filters.years[type][new Date(anime.datetime).getFullYear()] || false;
+            for (let i = 0; i < anime.genres.length; i++) {
+                filters.genres[type][anime.genres[i]] = filters.genres[type][anime.genres[i]] || false;
+            }
+        }
+        return filters;
+
     }
     static loaded = false;
     static #data = [];
     static async load() {
         try {
-            this.config.ac = localStorage.getItem("ac") === "true"? true: false;
-            this.config.allow_ac = localStorage.getItem("allow-ac") === "true"? true: false;
+
+            this.config.AC = localStorage.getItem("ac") === "true" ? true : false;
+            this.config.ACMode = this.config.AC ? "AC" : "NoAC";
+            this.config.allowAC = localStorage.getItem("allow-ac") === "true" ? true : false;
+
             let res = null;
-            if(window.location.host === "localhost") {
+            if (window.location.hostname === "localhost") {
                 res = await fetch('/WhereAnime_database/database.json', { cache: "no-store" });
             } else {
                 res = await fetch(`https://raw.githubusercontent.com/MoisesJPG/WhereAnime_database/main/database.json?t=${Date.now()}`, { cache: "no-store" });
             }
-            const data = await res.json();
-            this.#data = data;
+            this.#data = await res.json();
             this.loaded = true;
             log(`La base de datos se ha cargado`);
         } catch (err) {
             console.error('Error cargando JSON:', err);
         }
     }
-    static #getAnimesAC(){
-        return this.#data.filter(anime => (
-            anime.type.toLowerCase().split(" ")[0] === "hentai"
-        ));
-    }
-    static #getAnimesNoAC(){
-        return this.#data.filter(anime => (
-            anime.type.toLowerCase().split(" ")[0] === "anime" || 
-            anime.type.toLowerCase().split(" ")[0] === "unknown"
-        ));
-    }
-    static findAnimeById(id) {
-        return this.#data.find(anime => anime.id === id);
-    }
-    static findAnimesByTitle(title, sortBy = "title", order = "asc") {
-        function normalizeText(text) {
-            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    static V2_getAnimes() {
+        if (this.config.AC) {
+            return this.#data.filter(anime => (
+                anime.type.toLowerCase().split(" ")[0] === "hentai"
+            ));
+        } else {
+            return this.#data.filter(anime => (
+                anime.type.toLowerCase().split(" ")[0] !== "hentai" ||
+                anime.type.toLowerCase().split(" ")[0] === "unknown"
+            ));
         }
-        title = normalizeText(title);
+    }
+    static V2_getRecentEpisodes(limit = 20) {
         try {
-            let result = [];
-            if(this.config.ac) {
-                result = this.#getAnimesAC();
-            }else{
-                result = this.#getAnimesNoAC();
-            }
-            result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
-            result = result.filter(anime => anime.titles.some(t => normalizeText(t).includes(title)))
-            if (sortBy === "title" && order === "asc") result.sort((a,b) => a.titles[0].localeCompare(b.titles[0]));
-            if (sortBy === "title" && order === "desc") result.sort((a,b) => b.titles[0].localeCompare(a.titles[0]));
-            if (sortBy === "datetime" && order === "asc") result.sort((a,b) => a.datetime - b.datetime);
-            if (sortBy === "datetime" && order === "desc") result.sort((a,b) => b.datetime - a.datetime);
-            return result;
-        } catch (error) {
-            console.error(error);
-            return []
-        }
-    }
-    static getLastAnimes(limit = 20) {
-        let result = [];
-        if(this.config.ac) {
-            result = this.#getAnimesAC();
-        }else{
-            result = this.#getAnimesNoAC();
-        }
-        result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
-        result.sort((a, b) => b.datetime - a.datetime).slice(0, limit);
-        return result.slice(0, limit);
-    }
-    
-    static V2_findAnimeByMainTitle(title) {
-        try {
-            let result = [];
-            if(this.config.ac) {
-                result = this.#getAnimesAC();
-            }else{
-                result = this.#getAnimesNoAC();
-            }
-            result = result.filter(anime => anime.titles[0] === title)[0];
-            return result;
-        } catch (error) {
-            console.error(error);
-            return []
-        }
-    }
-    static V2_findAnimesByTitle(title, sortBy = "title", order = "asc") {
-        title = decodeURIComponent(title);
-        console.log(title,sortBy,order);
-        try {
-            let result = [];
-            if(this.config.ac) {
-                result = this.#getAnimesAC();
-            }else{
-                result = this.#getAnimesNoAC();
-            }
-            result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
-            result = result.filter(anime => anime.titles.some(t => t.includes(title)))
-            if (sortBy === "title" && order === "asc") result.sort((a,b) => a.titles[0].localeCompare(b.titles[0]));
-            if (sortBy === "title" && order === "desc") result.sort((a,b) => b.titles[0].localeCompare(a.titles[0]));
-            if (sortBy === "datetime" && order === "asc") result.sort((a,b) => a.datetime - b.datetime);
-            if (sortBy === "datetime" && order === "desc") result.sort((a,b) => b.datetime - a.datetime);
-            const response = result.map(anime => {return {
-                id: anime.id,
-                title: anime.titles[0],
-                otherTitles: anime.titles.slice(1),
-                type: anime.type,
-                thumbnail: anime.pages[0].thumbnail,
-                episodeCount: anime.episodes.length,
-                timestamp: anime.datetime
-            }})
-            return response;
-        } catch (error) {
-            console.error(error);
-            return []
-        }
-    }
-    static V2_getRecentEpisodes(limit = 20){
-        try {
-            let result = [];
-            if(this.config.ac) {
-                result = this.#getAnimesAC();
-            }else{
-                result = this.#getAnimesNoAC();
-            }
+            let result = this.V2_getAnimes();
             const allEpisodes = result.flatMap(anime => {
                 return anime.episodes.map(ep => {
                     const filteredUrls = ep.urls.filter(url => url.page.toLowerCase() === this.config.page || this.config.page === "all");
@@ -153,47 +90,60 @@ export class database {
         }
     }
     static V2_getRecentAnimes(limit = 20) {
-        let result = [];
-        if(this.config.ac) {
-            result = this.#getAnimesAC();
-        }else{
-            result = this.#getAnimesNoAC();
-        }
+        let result = this.V2_getAnimes();
         result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
         result.sort((a, b) => b.datetime - a.datetime)
-        let response = result.slice(0, limit).map(anime => { return {
-            id: anime.id,
-            title: anime.titles[0],
-            type: anime.type,
-            thumbnail: anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail,
-            timestamp: anime.datetime,
-            episodeCount: anime.episodes.length,
-            otherTitles: anime.titles.slice(1)
-        }})
+        let response = result.slice(0, limit).map(anime => {
+            return {
+                id: anime.id,
+                title: anime.titles[0],
+                type: anime.type,
+                thumbnail: anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail,
+                timestamp: anime.datetime,
+                episodeCount: anime.episodes.length,
+                otherTitles: anime.titles.slice(1)
+            }
+        })
         return response;
     }
-    static getLastEpisodes(limit = 20) {
+    static V2_findAnimeById(id) {
+        return this.#data.filter(anime => anime.id === id)[0];
+    }
+    static V2_findAnimeByMainTitle(title) {
         try {
-            const allEpisodes = this.#data.flatMap(anime => {                
-                if (this.config.ac && (anime.type === "unknown" || anime.type === "anime")) return [];
-                if (!this.config.ac && (anime.type === "hentai")) return [];
-                return anime.episodes.map(ep => {
-                    const filteredUrls = ep.urls.filter(url => url.page.toLowerCase() === this.config.page || this.config.page === "all");
-                    if (filteredUrls.length === 0) return null;
-                    return {
-                        animeId: anime.id,
-                        title: anime.titles[0],
-                        episode: ep.episode,
-                        datetime: ep.datetime,
-                        urls: filteredUrls
-                    };
-                });
-            }).filter(Boolean);
-            const sorted = allEpisodes.sort((a, b) => b.datetime - a.datetime);
-            return sorted.slice(0, limit);
-        } catch (err) {
-            console.error(err);
-            return [];
+            let result = this.V2_getAnimes();
+            result = result.filter(anime => anime.titles[0] === title)[0];
+            return result;
+        } catch (error) {
+            console.error(error);
+            return []
+        }
+    }
+    static V2_findAnimesByTitle(title, sortBy = "title", order = "asc") {
+        title = decodeURIComponent(title);
+        try {
+            let result = this.V2_getAnimes();
+            result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
+            result = result.filter(anime => anime.titles.some(t => t.includes(title)))
+            if (sortBy === "title" && order === "asc") result.sort((a, b) => a.titles[0].localeCompare(b.titles[0]));
+            if (sortBy === "title" && order === "desc") result.sort((a, b) => b.titles[0].localeCompare(a.titles[0]));
+            if (sortBy === "datetime" && order === "asc") result.sort((a, b) => a.datetime - b.datetime);
+            if (sortBy === "datetime" && order === "desc") result.sort((a, b) => b.datetime - a.datetime);
+            const response = result.map(anime => {
+                return {
+                    id: anime.id,
+                    title: anime.titles[0],
+                    otherTitles: anime.titles.slice(1),
+                    type: anime.type,
+                    thumbnail: anime.pages[0].thumbnail,
+                    episodeCount: anime.episodes.length,
+                    timestamp: anime.datetime
+                }
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+            return []
         }
     }
 }

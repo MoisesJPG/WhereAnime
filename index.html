@@ -46,115 +46,42 @@
             </section>
         </div>
         <div name="search" class="content" style="display: none;">
-            <section name="filter" style="display: none;">
-                <nav class="rows">
-                    <div class="row">
+            <section name="filter">
+                <nav id="advancedSearcher" class="rows">
+                    <div class="row" name="title">
                         <p>Titulo:</p>
-                        <input type="text" name="title">
+                        <input type="text">
                         <button class="search">Buscar</button>
                     </div>
                     <div class="cols">
-                        <div class="col">
-                            <details>
+                        <div class="col" name="types">
+                            <details open>
                                 <summary>Tipo:</summary>
-                                <div class="content rows">
-                                    <p><input type="checkbox" name="genre" id="">Anime</p>
-                                    <p><input type="checkbox" name="genre" id="">OVA</p>
-                                    <p><input type="checkbox" name="genre" id="">Pelicula</p>
-                                </div>
+                                <div class="content rows"></div>
                             </details>
                         </div>
-                        <div class="col">
-                            <details>
+                        <div class="col" name="genres">
+                            <details open>
                                 <summary>Generos:</summary>
-                                <div class="content rows">
-                                    <p><input type="checkbox" name="genre" id="">Desconocido</p>
-                                    <p><input type="checkbox" name="genre" id="">Aventura</p>
-                                    <p><input type="checkbox" name="genre" id="">Accion</p>
-                                </div>
+                                <div class="content rows"></div>
                             </details>
                         </div>
-                        <div class="col">
-                            <details>
+                        <div class="col" name="langs">
+                            <details open>
                                 <summary>Idioma:</summary>
-                                <div class="content rows">
-                                    <p><input type="checkbox" name="genre" id="">Sub. Español</p>
-                                    <p><input type="checkbox" name="genre" id="">Latino</p>
-                                </div>
+                                <div class="content rows"></div>
                             </details>
                         </div>
-                        <div class="col">
-                            <details>
+                        <div class="col" name="status">
+                            <details open>
                                 <summary>Estado:</summary>
-                                <div class="content rows">
-                                    <p><input type="checkbox" name="genre" id="">Desconocido</p>
-                                    <p><input type="checkbox" name="genre" id="">Proximamente</p>
-                                    <p><input type="checkbox" name="genre" id="">En emision</p>
-                                    <p><input type="checkbox" name="genre" id="">Finalizado</p>
-                                </div>
+                                <div class="content rows"></div>
                             </details>
                         </div>
-                        <div class="col">
-                            <details>
+                        <div class="col" name="years">
+                            <details open>
                                 <summary>Fecha:</summary>
-                                <div class="content rows">
-                                    <p><input type="checkbox" name="genre" id="">2025</p>
-                                    <p><input type="checkbox" name="genre" id="">2024</p>
-                                    <p><input type="checkbox" name="genre" id="">2023</p>
-                                    <p><input type="checkbox" name="genre" id="">2022</p>
-                                    <p><input type="checkbox" name="genre" id="">2021</p>
-                                    <p><input type="checkbox" name="genre" id="">2020</p>
-                                    <p><input type="checkbox" name="genre" id="">2019</p>
-                                    <p><input type="checkbox" name="genre" id="">2018</p>
-                                    <p><input type="checkbox" name="genre" id="">2017</p>
-                                    <p><input type="checkbox" name="genre" id="">2016</p>
-                                    <p><input type="checkbox" name="genre" id="">2015</p>
-                                    <p><input type="checkbox" name="genre" id="">2014</p>
-                                    <p><input type="checkbox" name="genre" id="">2013</p>
-                                    <p><input type="checkbox" name="genre" id="">2012</p>
-                                    <p><input type="checkbox" name="genre" id="">2011</p>
-                                    <p><input type="checkbox" name="genre" id="">2010</p>
-                                    <p><input type="checkbox" name="genre" id="">2009</p>
-                                    <p><input type="checkbox" name="genre" id="">2008</p>
-                                    <p><input type="checkbox" name="genre" id="">2007</p>
-                                    <p><input type="checkbox" name="genre" id="">2006</p>
-                                    <p><input type="checkbox" name="genre" id="">2005</p>
-                                    <p><input type="checkbox" name="genre" id="">2004</p>
-                                    <p><input type="checkbox" name="genre" id="">2003</p>
-                                    <p><input type="checkbox" name="genre" id="">2002</p>
-                                    <p><input type="checkbox" name="genre" id="">2001</p>
-                                    <p><input type="checkbox" name="genre" id="">2000</p>
-                                    <p><input type="checkbox" name="genre" id="">1999</p>
-                                    <p><input type="checkbox" name="genre" id="">1998</p>
-                                    <p><input type="checkbox" name="genre" id="">1997</p>
-                                    <p><input type="checkbox" name="genre" id="">1996</p>
-                                    <p><input type="checkbox" name="genre" id="">1995</p>
-                                    <p><input type="checkbox" name="genre" id="">1994</p>
-                                    <p><input type="checkbox" name="genre" id="">1993</p>
-                                    <p><input type="checkbox" name="genre" id="">1992</p>
-                                    <p><input type="checkbox" name="genre" id="">1991</p>
-                                    <p><input type="checkbox" name="genre" id="">1990</p>
-                                    <p><input type="checkbox" name="genre" id="">1989</p>
-                                    <p><input type="checkbox" name="genre" id="">1988</p>
-                                    <p><input type="checkbox" name="genre" id="">1987</p>
-                                    <p><input type="checkbox" name="genre" id="">1986</p>
-                                    <p><input type="checkbox" name="genre" id="">1985</p>
-                                    <p><input type="checkbox" name="genre" id="">1984</p>
-                                    <p><input type="checkbox" name="genre" id="">1983</p>
-                                    <p><input type="checkbox" name="genre" id="">1982</p>
-                                    <p><input type="checkbox" name="genre" id="">1981</p>
-                                    <p><input type="checkbox" name="genre" id="">1980</p>
-                                    <p><input type="checkbox" name="genre" id="">1979</p>
-                                    <p><input type="checkbox" name="genre" id="">1978</p>
-                                    <p><input type="checkbox" name="genre" id="">1977</p>
-                                    <p><input type="checkbox" name="genre" id="">1976</p>
-                                    <p><input type="checkbox" name="genre" id="">1975</p>
-                                    <p><input type="checkbox" name="genre" id="">1974</p>
-                                    <p><input type="checkbox" name="genre" id="">1973</p>
-                                    <p><input type="checkbox" name="genre" id="">1972</p>
-                                    <p><input type="checkbox" name="genre" id="">1971</p>
-                                    <p><input type="checkbox" name="genre" id="">1970</p>
-                                </div>
+                                <div class="content rows"></div>
                             </details>
                         </div>
                     </div>
@@ -175,15 +102,15 @@
                     <div class="data">
                         <h2 class="title"></h2>
                         <hr>
-                        <h3>Estado: <span class="status"></span></h3>
-                        <h3>Tipo: <span class="type"></span></h3>
-                        <h3>Episodios: <span class="episodes"></span></h3>
-                        <h3>Idioma: <span class="lang"></span></h3>
-                        <h3>Generos: <p class="genres"></p></h3>
+                        <h3><span>Estado:</span> <span class="status"></span></h3>
+                        <h3><span>Tipo:</span> <span class="type"></span></h3>
+                        <h3><span>Episodios:</span> <span class="episodes"></span></h3>
+                        <h3><span>Idioma:</span> <span class="lang"></span></h3>
+                        <h3><span>Generos:</span><p class="genres"></p></h3>
                         <hr>
-                        <h3>Ultima episodio: <span class="lastDate"></span></h3>
-                        <h3>Fecha de estreno: <span class="firstDate"></span></h3>
-                        <h3>Otros titulos: <p class="otherTitles"></p></h3>
+                        <h3><span>Ultima episodio:</span> <span class="lastDate"></span></h3>
+                        <h3><span>Fecha de estreno:</span> <span class="firstDate"></span></h3>
+                        <h3><span>Otros titulos:</span><p class="otherTitles"></p></h3>
                     </div>
                 </div>
             </section>

@@ -76,12 +76,12 @@ export function highlightMatch(text, searchTitle) {
 export function showAdultContentConfirm() {
     if (confirm('Estas apunto de activar el modo (+18) ¿Deseas continuar?')) {
         localStorage.setItem('allow-ac', true);
-        database.config.allow_ac = true;
+        database.config.allowAC = true;
         document.body.classList.add("ac");
         return true;
     } else {
         localStorage.setItem('allow-ac', false);
-        database.config.allow_ac = false;
+        database.config.allowAC = false;
         document.body.classList.remove("ac");
         return false;
     }

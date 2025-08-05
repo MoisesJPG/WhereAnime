@@ -243,6 +243,12 @@ main .content[name="episode"] section[name="animeData"] .content.hentai .data h3
 
 
 
+main .content[name="search"] section[name="filter"] {
+    border: 4px solid rgb( 32,  32,  48);
+    border-radius: 16px;
+    margin-top: 16px;
+    background-color: rgb( 64,  64,  96);
+}
 main .content[name="search"] section[name="filter"] p,
 main .content[name="search"] section[name="filter"] details summary {
     width: 100%;
@@ -273,7 +279,7 @@ main .content[name="search"] section[name="filter"] details .content {
     max-height: calc(16px * 8);
     padding-right: 8px;
     overflow-y: auto;
-    overflow-x: auto;
+    overflow-x: hidden;
 }
 main .content[name="search"] section[name="filter"] details .content p {
     display: flex;
@@ -302,9 +308,19 @@ main .content[name="search"] section[name="filter"] .rows .row {
 main .content[name="search"] section[name="filter"] .cols {
     display: flex;
     flex-direction: row;
+    padding: 8px;
+    padding-top: 0;
 }
 main .content[name="search"] section[name="filter"] .cols .col {
-    padding: 8px;
+    padding: 8px 16px;
+    border-right: 1px solid red;
+}
+main .content[name="search"] section[name="filter"] .cols .col:first-child {
+    padding-left: 8px;
+}
+main .content[name="search"] section[name="filter"] .cols .col:last-child {
+    padding-right: 8px;
+    border-right: 0;
 }
 main .content[name="search"] section[name="filter"] nav {}
 main .content[name="anime"] section[name="animeData"] .content {}
