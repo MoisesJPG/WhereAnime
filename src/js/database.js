@@ -41,9 +41,9 @@ export class database {
 
             let res = null;
             if (window.location.hostname === "localhost") {
-                res = await fetch('/WhereAnime_database/database.json', { cache: "no-store" });
+                res = await fetch('/database/database.json', { cache: "no-store" });
             } else {
-                res = await fetch(`https://raw.githubusercontent.com/MoisesJPG/WhereAnime_database/main/database.json?t=${Date.now()}`, { cache: "no-store" });
+                res = await fetch(`https://raw.githubusercontent.com/WhereAnime/database/main/database.json?t=${Date.now()}`, { cache: "no-store" });
             }
             this.#data = await res.json();
             this.loaded = true;

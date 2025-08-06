@@ -214,7 +214,7 @@ function prepareGoTo(newUrl = location) {
         if (!anime) { goTo("/WhereAnime"); return; }
         const animeData = mainContentAnime.querySelector('section[name="animeData"] .content')
         animeData.className = `content ${anime.type.toLowerCase()}`
-        animeData.querySelector('.image img').src = `/WhereAnime_database/image/cover/${anime.id}.webp`;
+        animeData.querySelector('.image img').src = `/images/cover/${anime.id}.webp`;
         animeData.querySelector('.title').textContent = anime.titles[0]
         animeData.querySelector('.status').textContent = anime.status;
         animeData.querySelector('.status').onclick = () => {
@@ -270,7 +270,7 @@ function prepareGoTo(newUrl = location) {
             const card = document.createElement("div");
             card.className = `card ${anime.type.toLowerCase()}`
             card.innerHTML = `
-                <div class="image"><img src="/WhereAnime_database/image/thumbnail/${anime.id}.webp" alt="${anime.titles[0]}"></div>
+                <div class="image"><img src="/images/thumbnail/${anime.id}.webp" alt="${anime.titles[0]}"></div>
                 <p class="title">${anime.titles[0]}</p>
                 <p class="episode">${episode.episode}</p>
                 <div class="hover">
@@ -329,7 +329,7 @@ function prepareGoTo(newUrl = location) {
         const animeData = mainContentEpisode.querySelector('section[name="animeData"] .content')
         animeData.className = `content ${anime.type.toLowerCase()}`
         animeData.querySelector('.image').onclick = () => goTo(`/WhereAnime/anime/${encodeURIComponent(animeTitle)}`);
-        animeData.querySelector('.image img').src = `/WhereAnime_database/image/cover/${anime.id}.webp`;
+        animeData.querySelector('.image img').src = `/images/cover/${anime.id}.webp`;
         animeData.querySelector('.title').textContent = anime.titles[0]
         animeData.querySelector('.episode').textContent = episode.episode;
         animeData.querySelector('.firstDate').textContent = new Date(episode.datetime).toLocaleDateString();
@@ -350,7 +350,7 @@ function prepareGoTo(newUrl = location) {
             card.className = `card ${anime.type.toLowerCase()}`
             card.innerHTML = `
                 <p class="page">${url.page}</p>
-                <div class="image"><img src="/WhereAnime_database/image/thumbnail/${anime.id}.webp" alt="${anime.titles[0]}"></div>
+                <div class="image"><img src="/images/thumbnail/${anime.id}.webp" alt="${anime.titles[0]}"></div>
                 <div class="hover">
                     <p>Titulo: ${anime.titles[0]}</p>
                     <p>Episodio: ${episode.episode}</p>
