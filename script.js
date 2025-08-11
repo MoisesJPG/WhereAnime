@@ -16,6 +16,15 @@ const config = {
     route: null,
     reloadDelay: 5 * 60 * 1000
 };
+const dayMap = {
+    1: {en: "monday", es: "Lunes"},
+    2: {en: "tuesday", es: "Martes"},
+    3: {en: "wednesday", es: "Miercoles"},
+    4: {en: "thursday", es: "Jueves"},
+    5: {en: "friday", es: "Viernes"},
+    6: {en: "saturday", es: "Sabado"},
+    0: {en: "sunday", es: "Domingo"},
+};
 
 const blobs = {}
 async function blobImage(imageUrl) {
@@ -118,6 +127,7 @@ function highlightMatch(text, searchTitle) {
 let firstTimeHome = true;
 function preparegoTo(newUrl = location) {
     function home() {
+        console.log("||||| HOME PAGE |||||");
         document.title = `WhereAnime`;
         const banner = mainContentHome.querySelector('section[name="banner"] .content');
         const recentEpisodes = mainContentHome.querySelector('section[name="recentEpisodes"] .content');
@@ -204,11 +214,8 @@ function preparegoTo(newUrl = location) {
         const delay = 5 * 60 * 1000;
         const now = Date.now() - 2 * 60 * 1000 - 1000;
         const rem = delay - (now % delay);       
-        intervals["homeRecentFirstRefresh"] = setTimeout(() => {
-            refresh();
-            intervals["homeRecentLoopRefresh"] = setInterval(() => {
-                refresh();
-            }, config.reloadDelay);
+        intervals["homeRecentFirstRefresh"] = setTimeout(() => { refresh();
+            intervals["homeRecentLoopRefresh"] = setInterval(() => { refresh(); }, config.reloadDelay);
         }, rem);
         mainContentHome.style.display = "";
         mainContentSearch.style.display = "none";
@@ -217,6 +224,7 @@ function preparegoTo(newUrl = location) {
         mainContentEpisode.style.display = "none";
     }
     async function search() {
+        console.log("||||| SEARCH PAGE |||||");
         document.title = `Repositorio - WhereAnime`;
         document.querySelector('#background img').src = ``;
         const params = new URLSearchParams(newUrl.search);
@@ -323,7 +331,10 @@ function preparegoTo(newUrl = location) {
         mainContentEpisode.style.display = "none";
     }
     async function horary(){
-        const reqDay = config.route[1] || "monday";
+        console.log("||||| HORARY PAGE |||||");
+        const reqDay = config.route[1] || dayMap[new Date(Date.now()).getDay()]["en"];
+        
+        
         const reqPageNumber = parseInt(config.route[2]) || 1;
         let animes = [];
         switch (reqDay.toLowerCase()) {
@@ -473,7 +484,19 @@ function preparegoTo(newUrl = location) {
             }
             animeData.querySelector('.genres').appendChild(span);
         }
-        animeData.querySelector('.episodes').textContent = anime.episodes.length
+        animeData.querySelector('.episodes').textContent = anime.episodes.length;
+        if(anime.status === "En Emision"){
+            let date = new Date((anime.episodes.length > 0 ? anime.episodes[0].timestamp : 0) + (7 * 24 * 60 * 60 * 1000));
+            animeData.querySelector('.nextDate').textContent = `${dayMap[date.getDay()]["es"]} (${date.toLocaleDateString()})`;
+            animeData.querySelector('.nextDate').onclick = () => {
+                goTo(`/horary/${dayMap[date.getDay()]["en"]}/1`)
+            };
+            animeData.querySelector('.nextDate').parentElement.style.display = "";
+        }else{
+            animeData.querySelector('.nextDate').parentElement.style.display = "none";
+            animeData.querySelector('.nextDate').textContent = "";
+
+        }
         animeData.querySelector('.lastDate').textContent = new Date(anime.episodes.length > 0 ? anime.episodes[0].timestamp : 0).toLocaleDateString();
         animeData.querySelector('.firstDate').textContent = new Date(anime.timestamp).toLocaleDateString();
         if (anime.titles.slice(1).length > 0) {

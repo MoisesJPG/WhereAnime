@@ -219,16 +219,18 @@ export class AdvancedSearcher {
             const hasGenresFilter = Object.values(genresFilter).some(v => v === true);
             const hasPagesFilter = Object.values(pagesFilter).some(v => v === true);
 
-            let animes = database.V2_getAnimes().filter(a => (
+            let animes = database.V2_getAnimes();
+            animes = animes.filter(a => (
                 (a.titles.some(t => t.toLowerCase().includes(titleFilter.toLowerCase()))) &&
                 (!hasStatusFilter || statusFilter[a.status] === true) &&
                 (!hasTypesFilter || typesFilter[a.type] === true) &&
                 (!hasLangsFilter || langsFilter[a.lang] === true) &&
                 (!hasYearsFilter || yearsFilter[new Date(a.timestamp).getFullYear()] === true) &&
                 (!hasGenresFilter || a.genres.some(g => genresFilter[g] === true))
-            )).sort((a,b) => b.id - a.id);
-            let _animes = animes.filter(a => (!hasPagesFilter || a.pages.some(p => pagesFilter[p.page] === true )))
-            const response = _animes.map(a => {
+            ))
+            animes.sort((animeA,animeB) => animeA.titles[0].localeCompare(animeB.titles[0], undefined, { numeric: true }));
+            animes = animes.filter(a => (!hasPagesFilter || a.pages.some(p => pagesFilter[p.page] === true )))
+            const response = animes.map(a => {
                 return {
                     id: a.id,
                     title: a.titles[0],

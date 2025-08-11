@@ -45,7 +45,10 @@ export class database {
             this.config.allowAC = localStorage.getItem("allow-ac") === "true" ? true : false;
 
             let res = null;
-            if (window.location.hostname === "localhost") {
+            if (
+                window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1"
+            ) {
                 res = await fetch('/database/database.json', { cache: "no-store" });
             } else {
                 res = await fetch(`https://raw.githubusercontent.com/WhereAnime/database/main/database.json?t=${Date.now()}`, { cache: "no-store" });

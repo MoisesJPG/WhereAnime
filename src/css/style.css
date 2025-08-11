@@ -563,18 +563,18 @@ footer {
 /* ============================== */
 /* === CARD VARIANT - UNKNOWN === */
 /* ============================== */
-.card.unknown       .page    {                                                                  background-color: rgb(080, 080, 080); }
-.card.unknown:hover .page    { color: rgb(016, 016, 016); border-color: rgb(128, 128, 128); background-color: rgb(128, 128, 128); }
-.card.unknown       .image   {                              border-color: rgb(080, 080, 080); }
-.card.unknown:hover .image   {                              border-color: rgb(112, 112, 112); }
-.card.unknown       .title   { color: rgb(160, 160, 160); }
-.card.unknown:hover .title   { color: rgb(112, 112, 112); }
-.card.unknown       .title b { color: rgb(160, 160, 160); }
-.card.unknown:hover .title b { color: rgb(128, 128, 128); }
-.card.unknown       .episode { color: rgb(096, 096, 096); }
-.card.unknown:hover .episode { color: rgb(160, 160, 160); }
-.card.unknown       .hover b { color: rgb(192, 128, 160); }
-.card.unknown:hover .hover b { color: rgb(255, 064, 128); }
+.card.desconocido       .page    {                                                                  background-color: rgb(080, 080, 080); }
+.card.desconocido:hover .page    { color: rgb(016, 016, 016); border-color: rgb(128, 128, 128); background-color: rgb(128, 128, 128); }
+.card.desconocido       .image   {                              border-color: rgb(080, 080, 080); }
+.card.desconocido:hover .image   {                              border-color: rgb(112, 112, 112); }
+.card.desconocido       .title   { color: rgb(160, 160, 160); }
+.card.desconocido:hover .title   { color: rgb(112, 112, 112); }
+.card.desconocido       .title b { color: rgb(160, 160, 160); }
+.card.desconocido:hover .title b { color: rgb(128, 128, 128); }
+.card.desconocido       .episode { color: rgb(096, 096, 096); }
+.card.desconocido:hover .episode { color: rgb(160, 160, 160); }
+.card.desconocido       .hover b { color: rgb(192, 128, 160); }
+.card.desconocido:hover .hover b { color: rgb(255, 064, 128); }
 /* ============================ */
 /* === CARD VARIANT - ANIME === */
 /* ============================ */
