@@ -11,7 +11,7 @@ export function generateCard(type, anime, episode, url, highlight) {
         p.page.toLowerCase() === (url ? url.page.toLowerCase() : database.config.page) ||
         database.config.page === "all"
     )[0].thumbnail;
-    let date = new Date(url ? url.time : (episode ? episode.datetime : anime.datetime)).toLocaleString().split(",")[0];
+    let date = new Date(url ? url.timestamp : (episode ? episode.timestamp : anime.timestamp)).toLocaleString().split(",")[0];
     /**/ let innerHTML = "";
     /*    */ innerHTML += `${url ? `<p class="page">${url.page}</p>` : ``}`
     /*    */ innerHTML += `<div class="image"><img src="${thumbnail !== "" ? thumbnail : `https://media1.tenor.com/m/lcPmye0KHp4AAAAC/yori-asanagi-whisper-me-a-love-song.gif`}" alt="${title}"></div>`;

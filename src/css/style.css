@@ -1,3 +1,7 @@
+:root {
+    /* --max-width: calc(256px * 4 + 16px * 3); */
+    --max-width: calc(256px * 4);
+}
 * {
     margin: 0;
     padding: 0;
@@ -15,24 +19,43 @@ html {
     background-position: center;
 }
 body {
-    background: rgb(16,16,24,0.9875);
+    /* background: rgb(16,16,24,0.9875); */
     min-height: 100vh;
 }
-
+#background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    z-index: -1;
+}
+#background img {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    filter: blur(16px);
+    scale: 1.125;
+}
 /* ============== */
 /* === HEADER === */
 /* ============== */
 header {
     width: 100%;
     height: 64px;
-    background: rgb(16,16,24);
+    background: rgb(016, 016, 016);
     position: sticky;
     top: 0;
     z-index: 2;
+    border-bottom: 4px solid rgb(064, 064, 064);
+    box-shadow: 0px 0px 16px 8px rgb(000, 000, 000);
 }
 header .content {
     padding: 16px;
-    max-width: calc(256px * 4 + 16px * 3);
+    max-width: calc(var(--max-width) - 16px * 2);
     margin: auto;
     display: flex;
     justify-content: space-between;
@@ -42,190 +65,382 @@ header .content h1 {
     font-size:   32px;
     line-height: 32px;
     color: white;
+    user-select: none;
 }
-header .content h1 a {
-    color: inherit;
-    text-decoration: none;
-}
-header .content h1 a:hover {
-    color: rgb(64,128,255);
-    text-decoration: underline;
-}
-header nav {
+header .content nav {
     display: flex;
     gap: 8px;
     align-items: flex-start;
 }
-header nav #searcher {
+header .content nav #searcher {
     display: flex;
     border-radius: 8px;
-    margin: 0 0;
+    margin: 0;
     background-color: white;
+    margin-right: 16px;
 }
-header nav #searcher input {
+header .content nav #searcher input {
     border: 0;
     background-color: transparent;
     height: 24px;
     padding: 4px 8px;
 }
-header nav #searcher input:focus {
+header .content nav #searcher input:focus {
     outline: none;
 }
-header nav #searcher.hidden input {
+header .content nav #searcher.hidden input {
     display: none;
 }
-header nav #searcher button {
+header .content nav #searcher button {
     border: 0;
     background-color: transparent;
     width: 32px;
     height: 32px;
 }
-header nav a {
-    padding: 8px;
+header .content nav a {
+    padding:     8px 16px;
     height:      16px;
     font-size:   16px;
+    font-weight: bold;
     line-height: 16px;
     text-decoration: none;
     color: white;
 }
-header nav a:hover {
-    color: rgb(64,128,255);
+header .content nav a:hover {
+    background-color: rgb(128, 128, 128);
+    border-radius: 8px;
 }
-header nav .sub {
-    display: flex;
-    flex-direction: column;
-}
-header nav .sub > a {
-    text-align: right;
-}
-header nav .sub > div{
-    display: none;
-    background: rgb(16,16,24);
-}
-header nav .sub:hover > div {
-    display: flex;
-    flex-direction: column;
-    border-radius: 0 0 8px 8px;   
-    position: sticky;
-    z-index: 2;
-    /* border-top: 4px solid rgb(64,96,128); */
-    /* border-left: 4px solid rgb(64,96,128); */
-    /* border-right: 4px solid rgb(64,96,128); */
-    border-bottom: 4px solid rgb(64,96,128);
-    /* box-shadow: 0px 0px 8px 4px black; */
-    outline: 4px solid rgb(16,16,24);
-    outline-offset: -4px -4px 0 -4px;
-}
-header nav .sub:hover > div a{
-    padding: 8px 16px;
-}
+
+
 
 /* ============ */
 /* === MAIN === */
 /* ============ */
 main {
-    padding: 16px;
-    max-width: calc(256px * 4 + 16px * 3);
+    min-height: calc(100vh - (64px + 4px) - 0px);
+}
+main > .content {
+    min-height: calc(100vh - (64px + 4px) - 0px);
+}
+main > .content section {
+    padding: 32px 0px;
+    background-color: rgb(032, 032, 032);
+}
+main > .content section > * {
+    width: calc(100% - 16px * 2);
+    max-width: calc(var(--max-width) - 16px * 2);
     margin: auto;
-    padding-top: 0;
-    /* background-color: rgb( 16,  16,  24); */
-    min-height: calc(100vh - 64px - 16px);
+    padding: 16px;
 }
-main section {
-
-}
-main section > h2 {
-    position: sticky;
-    padding: 16px 0;
-    top: calc(64px);
-    background-color: rgb(16,16,24);
-    color: rgb(192,208,255);
-    margin-bottom: 16px;
+main > .content section > h2 {
+    height:      24px;
+    font-size:   24px;
+    line-height: 24px;
+    color:            rgb(255,255,255);
     display: flex;
     justify-content: space-between;
-    z-index: 2;
 }
-main section#repository h2 {
-    justify-content: start;
-}
-main section > .content {
+main > .content section > .content {
     display: grid;
     flex-wrap: wrap;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    padding-bottom: 64px;
 }
-main section .content > h3 {
+
+
+
+main .content[name="home"] section[name="banner"] {
+    background-color: transparent;
+    height: calc(512px - 128px);
+}
+main .content[name="home"] section[name="banner"] .content {
+    height: inherit;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+main .content[name="home"] section[name="banner"] .content .data {
+    width: calc((var(--max-width) - 16px * 3 ) / 4 * 1.5 + 16px);
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+main .content[name="home"] section[name="banner"] .content .data .title{
+    font-size: 32px;
+    line-height: 32px;
+    color: rgb(255, 255, 255);
+    text-shadow: 0px 0px 16px rgb(000, 000, 000, 0.750);
+}
+main .content[name="home"] section[name="banner"] .content .data .genres{
+    color: rgb(255, 255, 255);
+    display: flex;
+    gap: 16px;
+}
+main .content[name="home"] section[name="banner"] .content .data .genres span{
+    padding: 8px 16px;
+    border-radius: 16px;
+    background-color: rgb(128, 192, 192);
+    box-shadow: 0 0 12px 0 rgb(000, 000, 000, 0.500);
+    color: rgb(000, 000, 000, 0.750);
+    height:      12px;
+    font-size:   12px;
+    line-height: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+main .content[name="home"] section[name="banner"] .content .data .see {
+    padding: 8px 16px;
+    border-radius: 16px;
+    background-color: rgb(128, 192, 192);
+    box-shadow: 0 0 12px 0 rgb(000, 000, 000, 0.500);
+    color: rgb(000, 000, 000, 0.500);
+    border: 4px solid rgb(000, 000, 000, 0.500);
+    height:      16px;
+    font-size:   16px;
+    line-height: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+main .content[name="home"] section[name="recentEpisodes"] {
+    border-top: 4px solid rgb(064, 064, 064);
+    box-shadow: 0px 0px 16px 8px rgb(000, 000, 000);
+}
+
+
+
+main .content[name="search"] section[name="filter"] {
+    padding-bottom: 0;
+    /* max-width: calc(var(--max-width) - 4px * 2);
+    border: 4px solid rgb( 32,  32,  48);
+    margin: auto;
+    margin-top: 16px;
+    padding: 0;
+    overflow: hidden; */
+}
+main .content[name="search"] section[name="filter"] .content{
+    display: block;
+}
+main .content[name="search"] section[name="filter"] .content nav {
+    max-width: calc(var(--max-width) - 16px * 2 );
+    border-radius: 16px;
+    padding: 8px;
+    border: 4px solid rgb(064, 064, 064);
+    background-color: rgb(016, 016, 016);
+}
+main .content[name="search"] section[name="filter"] .content nav .simple {
+    padding: 8px;
+}
+main .content[name="search"] section[name="filter"] .content nav .simple p {
+    width:       100%;
+    height:      20px;
+    font-size:   20px;
+    line-height: 20px;
+    font-weight: bold;
+    color: rgb(192, 192, 192);
+}
+main .content[name="search"] section[name="filter"] .content nav .simple div {
+    padding-top: 8px;
+    display: flex;
+    gap: 16px;
+}
+main .content[name="search"] section[name="filter"] .content nav .simple div input {
     width: 100%;
-    grid-column-start: 1;
-    grid-column-end: 5;
-    text-align: center;
-    color: rgb(192,  128,  160);
+    height:      16px;
+    font-size:   16px;
+    line-height: 16px;
+    color: rgb(192, 192, 192);
+    background-color: rgb(032, 032, 032);
+    padding: 4px 8px;
+    border: 4px solid rgb(064, 064, 064);
+    border-radius: 8px;
 }
-main .content[name="anime"] section[name="animeData"] .content,
+main .content[name="search"] section[name="filter"] .content nav .simple div button {
+    height:     32px;
+    font-size:  16px;
+    line-height: 0px;
+    padding: 8px 16px;
+    color: rgb(192, 192, 192);
+    background-color: rgb(032, 032, 032);
+    border: 4px solid rgb(064, 064, 064);
+    border-radius: 8px;
+    font-weight: bold;
+}
+main .content[name="search"] section[name="filter"] .content nav .simple div button:hover {
+    border-color: rgb(192, 192, 192);
+}
+main .content[name="search"] section[name="filter"] .content nav .advanced {
+    padding: 8px;
+    display: flex;
+    gap: 16px;
+}
+main .content[name="search"] section[name="filter"] .content nav .advanced details {
+
+}
+main .content[name="search"] section[name="filter"] .content nav .advanced details summary {
+    width:       100%;
+    height:      20px;
+    font-size:   20px;
+    line-height: 20px;
+    font-weight: bold;
+    color: rgb(192, 192, 192);
+}
+main .content[name="search"] section[name="filter"] .content nav .advanced details .content {
+    margin-top: 8px;
+    border-radius: 16px;
+    border: 4px solid rgb(064, 064, 064);
+    padding: 8px;
+}
+main .content[name="search"] section[name="filter"] .content nav .advanced details .content .list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 16px 8px 8px;
+    max-height: calc(13px * 8 + 8px * 7);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+main .content[name="search"] section[name="filter"] .content nav .advanced details .content .list p {
+    display: flex;
+    gap: 4px;
+    height: 13px;
+    font-size: 13px;
+    line-height: 13px;
+    color: white;
+}
+main .content[name="search"] section[name="results"] {
+    padding-top: 0;
+}
+
+
+
+main .content[name="anime"]   section[name="animeData"],
+main .content[name="episode"] section[name="animeData"] {
+    background-color: rgb(000, 000, 000, 0.500);
+    width: 100%;
+    max-width: 100%;
+}
+main .content[name="anime"]   section[name="animeData"] .content ,
 main .content[name="episode"] section[name="animeData"] .content {
+    background-color: transparent;
+    padding: 16px 16px 32px 16px;
+    max-width: calc(var(--max-width) - 16px * 2);
+    margin: auto;
     grid-template-columns: calc((100% - 16px * 3) / 4) auto;
-    padding-top: 16px;
 }
-main .content[name="anime"] section[name="animeData"] .content .image,
-main .content[name="episode"] section[name="animeData"] .content .image {
+main .content[name="anime"]   section[name="animeData"] .content .col1,
+main .content[name="episode"] section[name="animeData"] .content .col1 { 
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+main .content[name="anime"]   section[name="animeData"] .content .col1 .image,
+main .content[name="episode"] section[name="animeData"] .content .col1 .image {
     width: calc(100% - 4px * 2);
-    aspect-ratio: 10 / 16;
+    aspect-ratio: 11 / 16;
     display: flex;
     align-items: center;
     overflow: hidden;
-    border: 4px solid rgb( 80,  80,  96);
+    border: 4px solid rgb(064, 064, 064);
+    box-shadow: 0px 0px 32px 0px rgb(000, 000, 000, 0.750);
     border-radius: 16px;
     flex-direction: column;
 }
-main .content[name="anime"] section[name="animeData"] .content .image img,
-main .content[name="episode"] section[name="animeData"] .content .image img {
+main .content[name="anime"]   section[name="animeData"] .content .col1 .image img,
+main .content[name="episode"] section[name="animeData"] .content .col1 .image img {
     height: 100%;
     min-width: 100%;
 }
-main .content[name="anime"] section[name="animeData"] .content .data,
-main .content[name="episode"] section[name="animeData"] .content .data { 
-    width: 100%;padding: 8px 0;
-}
-main .content[name="anime"] section[name="animeData"] .content .data h2,
-main .content[name="episode"] section[name="animeData"] .content .data h2 { 
-    color: rgb(192, 224, 255);
-}
-main .content[name="anime"] section[name="animeData"] .content .data hr,
-main .content[name="episode"] section[name="animeData"] .content .data hr { 
-    width: 100%;
-    border: 0px solid rgb( 80,  80,  96);
-    border-top: 4px solid rgb( 80,  80,  96);
-    margin-top: 8px;
-    margin-bottom: 16px;
-}
-main .content[name="anime"] section[name="animeData"] .content .data h3,
-main .content[name="episode"] section[name="animeData"] .content .data h3 { 
-    min-height: 20px;
-    font-size: 20px;
+main .content[name="anime"]   section[name="animeData"] .content .col1 .status,
+main .content[name="episode"] section[name="animeData"] .content .col1 .status {
+    height:      20px;
+    font-size:   20px;
+    line-height: 20px;
     color: rgb(128, 160, 192);
     padding-bottom: 4px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 16px;
+    border: 4px solid rgb(000, 000, 000, 0.500);
+    color: rgb(000, 000, 000, 0.750);
+    text-align: center;
 }
-main .content[name="anime"] section[name="animeData"] .content .data h3 span,
-main .content[name="episode"] section[name="animeData"] .content .data h3 span {
+main .content[name="anime"]   section[name="animeData"] .content .col1 .status.onair,
+main .content[name="episode"] section[name="animeData"] .content .col1 .status.onair {
+    background-color: rgb(064, 192, 064);
+}
+main .content[name="anime"]   section[name="animeData"] .content .col1 .status.ended,
+main .content[name="episode"] section[name="animeData"] .content .col1 .status.ended {
+    background-color: rgb(192, 064, 064);
+}
+main .content[name="anime"]   section[name="animeData"] .content .col1 .status.unknown,
+main .content[name="episode"] section[name="animeData"] .content .col1 .status.unknown {
+    background-color: rgb(128, 128, 128);
+}
+main .content[name="anime"]   section[name="animeData"] .content .col2 .data,
+main .content[name="episode"] section[name="animeData"] .content .col2 .data { 
+    width: 100%;
+    padding: 16px 0;
+}
+main .content[name="anime"]   section[name="animeData"] .content .col2 .data h2,
+main .content[name="episode"] section[name="animeData"] .content .col2 .data h2 { 
+    font-size:   32px;
+    line-height: 32px;
+    color: rgb(255, 255, 255);
+    text-shadow: 0 0 16px rgb(000, 000, 000, 0.750);
+}
+main .content[name="anime"]   section[name="animeData"] .content .col2 .data h3,
+main .content[name="episode"] section[name="animeData"] .content .col2 .data h3 { 
+    height:      20px;
+    font-size:   20px;
+    line-height: 20px;
+    padding-top: 16px;
+    padding-bottom: 8px;
+    color: rgb(255, 255, 255);
+    text-shadow: 0 0 16px rgb(000, 000, 000, 0.750);
+}
+main .content[name="anime"]   section[name="animeData"] .content .col2 .data .row,
+main .content[name="episode"] section[name="animeData"] .content .col2 .data .row { 
+    padding-bottom: 8px;
+    text-shadow: 0px 0px 12px rgb(000, 000, 000, 1.000);
+}
+main .content[name="anime"]   section[name="animeData"] .content .col2 .data .row .title,
+main .content[name="episode"] section[name="animeData"] .content .col2 .data .row .title {
+    height:      16px;
+    font-size:   16px;
+    line-height: 16px;
+    font-weight: bold;
+    color: rgb(192, 192, 192);
+}
+main .content[name="anime"]   section[name="animeData"] .content .col2 .data .row p,
+main .content[name="episode"] section[name="animeData"] .content .col2 .data .row p {
     display: inline-block; 
-    height: 20px;
-    font-size: 20px;
-}
-main .content[name="anime"] section[name="animeData"] .content .data h3 .genres ,
-main .content[name="episode"] section[name="animeData"] .content .data h3 .genres  {
-    display: flex;
-    padding-top: 4px;
-    gap: 8px;
-}
-main .content[name="anime"] section[name="animeData"] .content .data h3 .genres span ,
-main .content[name="episode"] section[name="animeData"] .content .data h3 .genres span {
-    padding: 4px 8px;
-    border-radius: 8px;
-    background-color: rgb(032, 064, 096);
     height: 16px;
     font-size: 16px;
-    line-height: 16px;
+    color: rgb(255, 255, 255);
+    line-height: 16px
+}
+main .content[name="anime"]   section[name="animeData"] .content .col2 .data .row p.clickable,
+main .content[name="episode"] section[name="animeData"] .content .col2 .data .row p.clickable {
+    color: rgb(192, 255, 255);
+}
+main .content[name="anime"]   section[name="animeData"] .content .col2 .data .genres,
+main .content[name="episode"] section[name="animeData"] .content .col2 .data .genres  {
+    display: flex;
+    gap: 16px;
+}
+main .content[name="anime"]   section[name="animeData"] .content .col2 .data .genres span ,
+main .content[name="episode"] section[name="animeData"] .content .col2 .data .genres span {
+    padding: 8px 16px;
+    border-radius: 16px;
+    background-color: rgb(128, 192, 192);
+    box-shadow: 0 0 12px 0 rgb(000, 000, 000, 0.500);
+    color: rgb(000, 000, 000, 0.750);
+    height:      12px;
+    font-size:   12px;
+    line-height: 12px;
+    font-weight: bold;
     text-transform: uppercase;
 }
 main .content[name="anime"] section[name="animeData"] .content.hentai .image img,
@@ -240,93 +455,33 @@ main .content[name="anime"] section[name="animeData"] .content.hentai .data h3,
 main .content[name="episode"] section[name="animeData"] .content.hentai .data h3 {
     filter: blur( 4px);
 }
+main .content[name="anime"]   section[name="animeData"] .content,
+main .content[name="episode"] section[name="animeData"] .content {
 
+}
 
-
-main .content[name="search"] section[name="filter"] {
-    border: 4px solid rgb( 32,  32,  48);
-    border-radius: 16px;
-    margin-top: 16px;
-    background-color: rgb( 64,  64,  96);
+main .content[name="anime"]   section[name="episodeList"],
+main .content[name="episode"] section[name="episodeLinks"]  {
+    border-top: 4px solid rgb(064, 064, 064);
+    box-shadow: 0px 0px 16px 8px rgb(000, 000, 000);
 }
-main .content[name="search"] section[name="filter"] p,
-main .content[name="search"] section[name="filter"] details summary {
-    width: 100%;
-    font-size: 16px;
-    color: rgb(128, 160, 255);
-    font-weight: bold;
-}
-main .content[name="search"] section[name="filter"] input[type="text"] {
-    height: 12px;
-    font-size: 12px;
-    line-height: 12px;
-    color: rgb( 64,  96, 128);
-    padding: 4px 8px;
-    border: 2px solid red;
-    border-radius: 4px;
-}
-main .content[name="search"] section[name="filter"] button {
-    font-size: 12px;
-    height: 24px;
-    line-height: 4px;
-    padding: 8px 16px;
-    border: 2px solid red;
-    border-radius: 4px;
-    color: rgb( 64,  96, 128);
-    font-weight: bold;
-}
-main .content[name="search"] section[name="filter"] details .content {
-    max-height: calc(16px * 8);
-    padding-right: 8px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-main .content[name="search"] section[name="filter"] details .content p {
-    display: flex;
-    gap: 4px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid white;
-    height: 13px;
-    font-size: 13px;
-    line-height: 13px;
-}
-main .content[name="search"] section[name="filter"] nav > .row input[type="text"] {
-    width: calc(100% - 105px);
-}
-main .content[name="search"] section[name="filter"] .rows {
-    display: flex;
-    flex-direction: column;
-}
-main .content[name="search"] section[name="filter"] .rows .row {
-    padding: 8px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    column-gap: 8px;
-}
-main .content[name="search"] section[name="filter"] .cols {
-    display: flex;
-    flex-direction: row;
-    padding: 8px;
-    padding-top: 0;
-}
-main .content[name="search"] section[name="filter"] .cols .col {
-    padding: 8px 16px;
-    border-right: 1px solid red;
-}
-main .content[name="search"] section[name="filter"] .cols .col:first-child {
-    padding-left: 8px;
-}
-main .content[name="search"] section[name="filter"] .cols .col:last-child {
-    padding-right: 8px;
-    border-right: 0;
-}
-main .content[name="search"] section[name="filter"] nav {}
-main .content[name="anime"] section[name="animeData"] .content {}
+main .content[name="anime"] section[name="episodeList"] .content {}
 @media screen and (max-width: calc(256px * 4 + 16px * 3)) { main section > .content { grid-template-columns: repeat(3, 1fr); } }
 @media screen and (max-width: calc(256px * 3 + 16px * 2)) { main section > .content { grid-template-columns: repeat(2, 1fr); } }
 @media screen and (max-width: calc(256px * 2 + 16px * 1)) { main section > .content { grid-template-columns: repeat(1, 1fr); } }
+
+
+
+/* ============== */
+/* === FOOTER === */
+/* ============== */
+footer {
+    background-color: rgb(016, 016, 016);
+    border-top: 4px solid rgb(064, 064, 064);
+    padding: 16px 16px 32px 16px;
+}
+
+
 
 /* ============= */
 /* === CARDS === */
@@ -402,33 +557,33 @@ main .content[name="anime"] section[name="animeData"] .content {}
 /* ============================== */
 /* === CARD VARIANT - UNKNOWN === */
 /* ============================== */
-.card.unknown       .page    {                                                                  background-color: rgb( 80,  80,  80); }
-.card.unknown:hover .page    { color: rgb( 16,  16,  16); border-color: rgb(128, 128, 128); background-color: rgb( 128, 128, 128); }
-.card.unknown       .image   {                              border-color: rgb( 80,  80,  80); }
+.card.unknown       .page    {                                                                  background-color: rgb(080, 080, 080); }
+.card.unknown:hover .page    { color: rgb(016, 016, 016); border-color: rgb(128, 128, 128); background-color: rgb(128, 128, 128); }
+.card.unknown       .image   {                              border-color: rgb(080, 080, 080); }
 .card.unknown:hover .image   {                              border-color: rgb(112, 112, 112); }
 .card.unknown       .title   { color: rgb(160, 160, 160); }
 .card.unknown:hover .title   { color: rgb(112, 112, 112); }
 .card.unknown       .title b { color: rgb(160, 160, 160); }
 .card.unknown:hover .title b { color: rgb(128, 128, 128); }
-.card.unknown       .episode { color: rgb( 96,  96,  96); }
+.card.unknown       .episode { color: rgb(096, 096, 096); }
 .card.unknown:hover .episode { color: rgb(160, 160, 160); }
 .card.unknown       .hover b { color: rgb(192, 128, 160); }
-.card.unknown:hover .hover b { color: rgb(255,  64, 128); }
+.card.unknown:hover .hover b { color: rgb(255, 064, 128); }
 /* ============================ */
 /* === CARD VARIANT - ANIME === */
 /* ============================ */
-.card.anime       .page    {                                                                  background-color: rgb( 80,  80,  96); }
-.card.anime:hover .page    { color: rgb( 16,  16,  24); border-color: rgb( 64, 128, 255); background-color: rgb( 64, 128, 255); }
-.card.anime       .image   {                              border-color: rgb( 80,  80,  96); }
-.card.anime:hover .image   {                              border-color: rgb( 64, 128, 255); }
+.card.anime       .page    {                                                                  background-color: rgb(080, 080, 096); }
+.card.anime:hover .page    { color: rgb(016, 016, 024); border-color: rgb(064, 128, 255); background-color: rgb(064, 128, 255); }
+.card.anime       .image   {                              border-color: rgb(080, 080, 096); }
+.card.anime:hover .image   {                              border-color: rgb(064, 128, 255); }
 .card.anime       .title   { color: rgb(128, 160, 192); }
-.card.anime:hover .title   { color: rgb( 64, 128, 255); }
+.card.anime:hover .title   { color: rgb(064, 128, 255); }
 .card.anime       .title b { color: rgb(192, 128, 160); }
-.card.anime:hover .title b { color: rgb(255,  64, 128); }
-.card.anime       .episode { color: rgb( 64,  96, 128); }
+.card.anime:hover .title b { color: rgb(255, 064, 128); }
+.card.anime       .episode { color: rgb(064, 096, 128); }
 .card.anime:hover .episode { color: rgb(128, 160, 192); }
 .card.anime       .hover b { color: rgb(192, 128, 160); }
-.card.anime:hover .hover b { color: rgb(255,  64, 128); }
+.card.anime:hover .hover b { color: rgb(255, 064, 128); }
 /* ============================= */
 /* === CARD VARIANT - HENTAI === */
 /* ============================= */
@@ -444,31 +599,46 @@ body:not(.ac) .card.hentai .hover     { filter: blur( 4px); z-index: 1; }
 .card.hentai       .title   { color: rgb(192, 128, 160); }
 .card.hentai:hover .title   { color: rgb(255,  64, 128); }
 .card.hentai       .title b { color: rgb(128, 160, 255); }
-.card.hentai:hover .title b { color: rgb( 64, 128, 255); }
+.card.hentai:hover .title b { color: rgb(064, 128, 255); }
 .card.hentai       .episode { color: rgb(128,  64,  96); }
 .card.hentai:hover .episode { color: rgb(192, 128, 160); }
 .card.hentai       .hover b { color: rgb(128, 160, 255); }
-.card.hentai:hover .hover b { color: rgb( 64, 128, 255); }
+.card.hentai:hover .hover b { color: rgb(064, 128, 255); }
+/* ============================ */
+/* === CARD VARIANT - ANIME === */
+/* ============================ */
+.card.pelicula       .page    {                                                                  background-color: rgb(080, 096, 080); }
+.card.pelicula:hover .page    { color: rgb(016, 024, 016); border-color: rgb(128, 255, 064); background-color: rgb(128, 255, 064); }
+.card.pelicula       .image   {                              border-color: rgb(080, 096, 080); }
+.card.pelicula:hover .image   {                              border-color: rgb(128, 255, 064); }
+.card.pelicula       .title   { color: rgb(160, 192, 128); }
+.card.pelicula:hover .title   { color: rgb(128, 255, 064); }
+.card.pelicula       .title b { color: rgb(128, 160, 192); }
+.card.pelicula:hover .title b { color: rgb(064, 128, 255); }
+.card.pelicula       .episode { color: rgb(096, 128, 064); }
+.card.pelicula:hover .episode { color: rgb(160, 192, 128); }
+.card.pelicula       .hover b { color: rgb(128, 160, 192); }
+.card.pelicula:hover .hover b { color: rgb(064, 128, 255); }
 
 /* ================= */
 /* === NAVIGATOR === */
 /* ================= */
 .navigator {
-    position: fixed;
+    /* position: fixed; */
     bottom: 0;
+    margin: auto;
     width: 100%;
-    max-width: calc(256px * 4 + 16px * 3);
+    max-width: var(--max-width);
     user-select: none;
     z-index: 2;
 }
 .navigator .content {
     display: flex;
     width: fit-content;
-    background-color: rgb(16,16,24);
+    background-color: rgb(016, 016, 016);
     margin: auto;
-    border: 4px solid rgb( 80,  80, 96);
-    border-bottom: 0;
-    border-radius: 16px 16px 0 0;
+    border: 4px solid rgb(064, 064, 064);
+    border-radius: 16px 16px;
     padding: 8px;
     gap: 8px;
 }
@@ -478,14 +648,14 @@ body:not(.ac) .card.hentai .hover     { filter: blur( 4px); z-index: 1; }
     width: 24px;
     height: 16px;
     font-size: 16px;
-    border-radius: 8px;
     line-height: 16px;
+    border-radius: 8px;
     padding: 8px;
     text-align: center;
     flex: 0 0 auto;
     font-family: monospace;
     text-decoration: none;
-    background-color: rgb( 128, 128, 128);
+    background-color: rgb(128, 128, 128);
 }
 .navigator .content a.current {
     background-color:rgb(192, 128, 160);
@@ -494,137 +664,52 @@ body:not(.ac) .card.hentai .hover     { filter: blur( 4px); z-index: 1; }
     background-color:rgb(128, 160, 192);
 }
 .navigator .content a.button:hover {
-    background-color:rgb( 64, 128, 255);
+    background-color:rgb(064, 128, 255);
 }
 
-#route {
-    color: white;
-    display: flex;
-    gap: 4px;
-    height: 16px;
-    font-size: 16px;
-    line-height: 16px;
-}
-#route span {
-    font-weight: bold;
-    color: hsl(220, 25%, 50%);
-}
-#route span.enable{
-    color: hsl(220, 100%, 63%);
-    font-weight: bold;
-}
-#route span.enable:hover {
-    cursor: pointer;
-    color: hsl(220, 100%, 75%);
-}
-#route span:not(:last-child)::after,
-#route span:only-child::after {
-    content: "/";
-    color: white;
-    padding-left: 4px;
-}
-/* ============= */
-/* === MODAL === */
-/* ============= */
-#modal {
-    position: fixed;
-    top: 0;
-    z-index: 3;
-    left: 0;
+.dayNavigator {
+    /* position: fixed; */
+    bottom: 0;
+    margin: auto;
     width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    background-color: rgb(0, 0, 0, 0.75);
-    align-items: center;
+    max-width: var(--max-width);
+    user-select: none;
+    z-index: 2;
 }
-#modal > .content {
-    border: 16px solid rgb(16, 16, 24);
-    background-color: rgb(16, 16, 24);
-    border-radius: 24px;
-    width: calc(256px * 4 + 16px * 3);
-    max-width: calc(100% - 64px);
-    max-height: calc(100% - 16px * 2 * 2);
-    box-shadow: 0px 0px 16px rgb(80, 80, 96);
-    display: flex;
-    flex-direction: column;
-}
-@media screen and (max-width: calc(256px * 5 + 16px * 4)) { #modal > .content { width: min(calc(256px * 4 + 16px * 3), 100% - 64px); } }
-@media screen and (max-width: calc(256px * 4 + 16px * 3)) { #modal > .content { width: min(calc(256px * 3 + 16px * 2), 100% - 64px); } }
-@media screen and (max-width: calc(256px * 3 + 16px * 2)) { #modal > .content { width: min(calc(256px * 2 + 16px * 1), 100% - 64px); } }
-#modal > .content .head {
-    width: 100%;
-    max-height: 64px;
-    display: flex;
-    flex-direction: row;
-    border-bottom: 1px solid rgb(16,16,24);
-    padding-bottom: 16px;
-    /* margin-bottom: 16px; */
-    gap: 16px;
-    position: sticky;
-    top: 0;
-    background: rgb(16,16,24);
-}
-#modal > .content .head .back {
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    flex: 0 0 auto;
-    border-radius: 8px;
-    border: 1px solid rgb(0,0,8);
-    color: rgb(0,0,8);
-    background: rgb(80,80,96);
-}
-#modal > .content .head .back:hover {
-    background: rgb(64,128,255);
-}
-#modal > .content .head .info {
-    width: calc(100%);
-}
-#modal > .content .head .info .title {
-    width: calc(100%);
-    font-size: 24px;
-    line-height: 24px;
-    font-weight: bold;
-    color: rgb(128,160,192);
-}
-#modal > .content .head .info .sub-title {
-    width: calc(100%);
-    height: 16px;
-    font-size: 16px;
-    line-height: 16px;
-    font-weight: bold;
-    color: rgb(64,96,128);
-}
-#modal > .content .head .close {
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    flex: 0 0 auto;
-    border-radius: 8px;
-    border: 1px solid rgb(0,0,8);
-    color: rgb(0,0,8);
-    background: rgb(80,80,96);
-}
-#modal > .content .head .close:hover {
-    background: rgb(64,128,255);
-}
-#modal > .content .body {
+.dayNavigator .content {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    justify-content: center;
-    height: 100%;
-    max-height: 100%;
-    overflow-y: auto;
-    padding-bottom: 52px;
+    background-color: rgb(016, 016, 016);
+    margin: auto;
+    border: 4px solid rgb(064, 064, 064);
+    border-radius: 16px 16px;
+    padding: 8px;
+    gap: 8px;
+    grid-template-columns: repeat(7, 1fr);
 }
-#modal > .content .navigator {
-    position: relative;
-    bottom: 36px;
-    margin-bottom: -52px;
+.dayNavigator .content a {
+    color: white;
+    display: block;
+    height: 16px;
+    font-size: 16px;
+    line-height: 16px;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    flex: 0 0 auto;
+    font-family: monospace;
+    text-decoration: none;
+    background-color: rgb(128, 128, 128);
 }
-@media screen and (max-width: calc(256px * 5 + 16px * 4)) { #modal > .content .body { grid-template-columns: repeat(4, 1fr); } }
-@media screen and (max-width: calc(256px * 4 + 16px * 3)) { #modal > .content .body { grid-template-columns: repeat(3, 1fr); } }
-@media screen and (max-width: calc(256px * 3 + 16px * 2)) { #modal > .content .body { grid-template-columns: repeat(2, 1fr); } }
-@media screen and (max-width: calc(256px * 2 + 16px * 1)) { #modal > .content .body { grid-template-columns: repeat(1, 1fr); } }
+.dayNavigator .content a.current {
+    background-color:rgb(192, 128, 160);
+}
+.dayNavigator .content a.button {
+    background-color:rgb(128, 160, 192);
+}
+.dayNavigator .content a.button:hover {
+    background-color:rgb(064, 128, 255);
+}
+
+
+.clickable { user-select: none; cursor: pointer; }
+.clickable:focus { user-select: none; cursor: inherit; }
