@@ -41,6 +41,8 @@ async function loadDatabase() {
 }
 const intervals = {}
 function goTo(url) {
+    console.log(url);
+    
     for(const blobUrl in blobs) { URL.revokeObjectURL(blobs[blobUrl]) }
     scrollTo(0, 0);
     const base = window.location.origin; // Base actual
@@ -164,7 +166,6 @@ function preparegoTo(newUrl = location) {
             const animes = database.V2_getRecentAnimes();
             for (let i = 0; i < animes.length; i++) {
                 const anime = animes[i];
-
                 const card = document.createElement("div");
                 card.className = `card ${anime.type.toLowerCase().split(" ")[0]}`
                 card.innerHTML = `
@@ -322,33 +323,90 @@ function preparegoTo(newUrl = location) {
         mainContentEpisode.style.display = "none";
     }
     async function horary(){
-        const day = config.route[1] || "Monday";
+        const reqDay = config.route[1] || "monday";
+        const reqPageNumber = parseInt(config.route[2]) || 1;
         let animes = [];
-        switch (day) {
-            case "Monday"   : animes = database.V2_getMondayAnimes();    break;
-            case "Tuesday"  : animes = database.V2_getTuesdayAnimes();   break;
-            case "Wednesday": animes = database.V2_getWednesdayAnimes(); break;
-            case "Thursday" : animes = database.V2_getThursdayAnimes();  break;
-            case "Friday"   : animes = database.V2_getFridayAnimes();    break;
-            case "Saturday" : animes = database.V2_getSaturdayAnimes();  break;
-            case "Sunday"   : animes = database.V2_getSundayAnimes();    break;
+        switch (reqDay.toLowerCase()) {
+            case "monday"   : animes = database.V2_getMondayAnimes();    break;
+            case "tuesday"  : animes = database.V2_getTuesdayAnimes();   break;
+            case "wednesday": animes = database.V2_getWednesdayAnimes(); break;
+            case "thursday" : animes = database.V2_getThursdayAnimes();  break;
+            case "friday"   : animes = database.V2_getFridayAnimes();    break;
+            case "saturday" : animes = database.V2_getSaturdayAnimes();  break;
+            case "sunday"   : animes = database.V2_getSundayAnimes();    break;
             default: goTo("/"); return;
         }
-        console.log(day);
+        console.log(reqDay);
 
         const dayNavigator = mainContentHorary.querySelector(`section[name="dayNavigator"] .content`);
-        dayNavigator.querySelector(`a[name="monday"]`).onclick = () => { goTo("/horary/monday"); };
-        dayNavigator.querySelector(`a[name="tuesday"]`).onclick = () => { goTo("/horary/tuesday"); };
-        dayNavigator.querySelector(`a[name="wednesday"]`).onclick = () => { goTo("/horary/wednesday"); };
-        dayNavigator.querySelector(`a[name="thursday"]`).onclick = () => { goTo("/horary/thursday"); };
-        dayNavigator.querySelector(`a[name="friday"]`).onclick = () => { goTo("/horary/friday"); };
-        dayNavigator.querySelector(`a[name="saturday"]`).onclick = () => { goTo("/horary/saturday"); };
-        dayNavigator.querySelector(`a[name="sunday"]`).onclick = () => { goTo("/horary/sunday"); };
+        dayNavigator.querySelectorAll(`a`).forEach(el => {el.classList.remove("current"); el.classList.add("button");});
+        dayNavigator.querySelector(`a[name="${reqDay}"]`).classList.add("current");
+        dayNavigator.querySelector(`a[name="${reqDay}"]`).classList.remove("button");
+        if(reqDay === "thursday"){
+            dayNavigator.parentElement.querySelector('.message').textContent = "Puede que aparezcan animes de mas mientras organizo la base de datos";
+            dayNavigator.parentElement.querySelector('.message').style.display = "";
+        }else{
+            dayNavigator.parentElement.querySelector('.message').textContent = "";
+            dayNavigator.parentElement.querySelector('.message').style.display = "none";
+        }
 
-        const animeList = mainContentSearch.querySelector(`section[name="results"] .content`);
-
-        console.log(database.V2_getMondayAnimes());
+        const animeList = mainContentHorary.querySelector(`section[name="animeList"] .content`);
         
+        let itemCount = 20;
+        if (reqPageNumber < 1) { goTo(`/horary/${reqDay}/1`); return; }
+        if (reqPageNumber > 1 && reqPageNumber > Math.ceil(animes.length / itemCount)) { goTo(`/horary/${reqDay}/${Math.ceil(animes.length / itemCount)}`); return; }
+        let i = 0
+        for (let o = (reqPageNumber - 1) * itemCount; o < Math.min(reqPageNumber * itemCount, animes.length); o++, i++) {
+            const anime = animes[o];
+            const card = document.createElement("div");
+            card.className = `card ${anime.type.toLowerCase().split(" ")[0]}`
+            console.log(anime.title, await thumbnailAnimeImage(anime.id, anime.thumbnail));
+            
+            card.innerHTML = `
+                <div class="image"><img src="${await thumbnailAnimeImage(anime.id, anime.thumbnail)}" alt="${anime.title}"></div>
+                <p class="title">${anime.title}</p>
+                <div class="hover">
+                    <p>Titulo: ${anime.title}</p>
+                    <p>Episodios: ${anime.episodeCount}</p>
+                    <p>Fecha: ${new Date(anime.timestamp).toLocaleDateString()}</p>
+                    ${anime.otherTitles.length > 0 ? `<p>Otros titulos:<br> - ${anime.otherTitles.join("<br> - ")}</p>` : ""}
+                </div>
+            `;
+            card.onclick = () => goTo(`/anime/${encodeURIComponent(anime.title)}`)
+            if (animeList.children[i]) {
+                animeList.replaceChild(card, animeList.children[i]);
+            } else {
+                animeList.appendChild(card);
+            }
+        }
+        for (let o = animeList.childElementCount - 1; o >= i; o--) {
+            animeList.children[o].remove();
+        }
+
+        const navigator = mainContentHorary.querySelector(".navigator .content");
+        navigator.innerHTML = "";
+        let min = 1, cur = reqPageNumber, max = Math.ceil(animes.length / itemCount);
+        const navigatorIndex = generateNavigatorList(min, cur, max);
+        for (const number of navigatorIndex) {
+            let text = number["text"], value = number["value"];
+            let title = `Ir a la pagina ${value}`;
+            if (text === "<<") title = `Ir a la primera pagina`;
+            if (text === "<") title = `Ir a la pagina anterior`;
+            if (text === ">") title = `Ir a la pagina siguiente`;
+            if (text === ">>") title = `Ir a la ultima pagina`;
+            const a = document.createElement("a");
+            a.title = title;
+            a.innerHTML = text;
+            if (value !== cur && value > 0 && value <= max) {
+                a.className = "button";
+                a.onclick = () => { goTo(`/horary/${reqDay}/${value}`); };
+            } else {
+                if (text === cur) {
+                    a.className = "current";
+                }
+            }
+            navigator.appendChild(a);
+        }
         mainContentHome.style.display = "none";
         mainContentSearch.style.display = "none";
         mainContentHorary.style.display = "";
@@ -602,7 +660,7 @@ function preparegoTo(newUrl = location) {
     while (config.route.endsWith("/")) { config.route = config.route.substring(0, config.route.length - 1); }
     while (config.route.startsWith("/")) { config.route = config.route.substring(1, config.route.length); }
     config.route = config.route.split("/");
-    console.log(config.route);
+    console.log(config.route[0]);
         
     switch (config.route[0]) {
         case "": home(); break;
@@ -688,6 +746,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         mainContentHome.querySelector('section[name="recentEpisodes"] .content').innerHTML += `<div class="card anime"><div class="image"><img src="" alt=""></div></div>`;
         mainContentHome.querySelector('section[name="recentAnimes"] .content').innerHTML += `<div class="card anime"><div class="image"><img src="" alt=""></div></div>`;
     }
+    
+    // Horary Page
+    const dayNavigator = mainContentHorary.querySelector(`section[name="dayNavigator"] .content`);
+    dayNavigator.querySelector(`a[name="monday"]`).onclick = () => { goTo("/horary/monday"); };
+    dayNavigator.querySelector(`a[name="tuesday"]`).onclick = () => { goTo("/horary/tuesday"); };
+    dayNavigator.querySelector(`a[name="wednesday"]`).onclick = () => { goTo("/horary/wednesday"); };
+    dayNavigator.querySelector(`a[name="thursday"]`).onclick = () => { goTo("/horary/thursday"); };
+    dayNavigator.querySelector(`a[name="friday"]`).onclick = () => { goTo("/horary/friday"); };
+    dayNavigator.querySelector(`a[name="saturday"]`).onclick = () => { goTo("/horary/saturday"); };
+    dayNavigator.querySelector(`a[name="sunday"]`).onclick = () => { goTo("/horary/sunday"); };
     
     // Last step
     await loadDatabase();

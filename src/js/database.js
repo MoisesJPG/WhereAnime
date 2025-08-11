@@ -100,13 +100,26 @@ export class database {
         }
     }
     static #V2_getAnimesByDay(day) {
-        let dayMap = [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ];
-        let animes = this.#data.filter(anime => anime.status === "En Emision");
+        let dayMap = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let animes = this.V2_getAnimes();
+        animes = animes.filter(anime => anime.status === "En Emision" || anime.status === "Desconocido");
         animes = animes.filter(anime => {
-            const date = new Date(anime.episodes[0].timestamp + (7 * 24 * 60 * 60 * 1000));
-            return date.getDay()+1 === dayMap.indexOf(day)
+            const date = new Date((anime.episodes.length > 0 ? anime.episodes[0].timestamp : 0) + (7 * 24 * 60 * 60 * 1000));
+            return date.getDay() === dayMap.indexOf(day)
         });
-        return animes;
+        animes.sort((animeA, animeB) => animeA.titles[0].localeCompare(animeB.titles[0], undefined, { numeric: true}))
+        let response = animes.map(anime => {
+            return {
+                id: anime.id,
+                title: anime.titles[0],
+                type: anime.type,
+                thumbnail: anime.pages.length > 0 ? anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail : "",
+                timestamp: anime.timestamp,
+                episodeCount: anime.episodes.length,
+                otherTitles: anime.titles.slice(1)
+            }
+        });
+        return response;
     }
     
     static V2_getMondayAnimes()    { return this.#V2_getAnimesByDay("Monday"   ); }

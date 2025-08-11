@@ -312,6 +312,12 @@ main .content[name="search"] section[name="filter"] .content nav .advanced detai
 main .content[name="search"] section[name="results"] {
     padding-top: 0;
 }
+main .content[name="horary"] section[name="dayNavigator"] {
+    padding-bottom: 0;
+}
+main .content[name="horary"] section[name="animeList"] {
+    padding-top: 0;
+}
 
 
 
@@ -572,18 +578,18 @@ footer {
 /* ============================ */
 /* === CARD VARIANT - ANIME === */
 /* ============================ */
-.card.anime       .page    {                                                                  background-color: rgb(080, 080, 096); }
-.card.anime:hover .page    { color: rgb(016, 016, 024); border-color: rgb(064, 128, 255); background-color: rgb(064, 128, 255); }
-.card.anime       .image   {                              border-color: rgb(080, 080, 096); }
-.card.anime:hover .image   {                              border-color: rgb(064, 128, 255); }
-.card.anime       .title   { color: rgb(128, 160, 192); }
-.card.anime:hover .title   { color: rgb(064, 128, 255); }
-.card.anime       .title b { color: rgb(192, 128, 160); }
-.card.anime:hover .title b { color: rgb(255, 064, 128); }
-.card.anime       .episode { color: rgb(064, 096, 128); }
-.card.anime:hover .episode { color: rgb(128, 160, 192); }
-.card.anime       .hover b { color: rgb(192, 128, 160); }
-.card.anime:hover .hover b { color: rgb(255, 064, 128); }
+.card.anime       .page   , .card.live       .page    {                                                                  background-color: rgb(080, 080, 096); }
+.card.anime:hover .page   , .card.live:hover .page    { color: rgb(016, 016, 024); border-color: rgb(064, 128, 255); background-color: rgb(064, 128, 255); }
+.card.anime       .image  , .card.live       .image   {                              border-color: rgb(080, 080, 096); }
+.card.anime:hover .image  , .card.live:hover .image   {                              border-color: rgb(064, 128, 255); }
+.card.anime       .title  , .card.live       .title   { color: rgb(128, 160, 192); }
+.card.anime:hover .title  , .card.live:hover .title   { color: rgb(064, 128, 255); }
+.card.anime       .title b, .card.live       .title b { color: rgb(192, 128, 160); }
+.card.anime:hover .title b, .card.live:hover .title b { color: rgb(255, 064, 128); }
+.card.anime       .episode, .card.live       .episode { color: rgb(064, 096, 128); }
+.card.anime:hover .episode, .card.live:hover .episode { color: rgb(128, 160, 192); }
+.card.anime       .hover b, .card.live       .hover b { color: rgb(192, 128, 160); }
+.card.anime:hover .hover b, .card.live:hover .hover b { color: rgb(255, 064, 128); }
 /* ============================= */
 /* === CARD VARIANT - HENTAI === */
 /* ============================= */
@@ -700,14 +706,22 @@ body:not(.ac) .card.hentai .hover     { filter: blur( 4px); z-index: 1; }
     text-decoration: none;
     background-color: rgb(128, 128, 128);
 }
-.dayNavigator .content a.current {
-    background-color:rgb(192, 128, 160);
-}
 .dayNavigator .content a.button {
     background-color:rgb(128, 160, 192);
 }
+.dayNavigator .content a.current {
+    background-color:rgb(192, 128, 160);
+}
 .dayNavigator .content a.button:hover {
     background-color:rgb(064, 128, 255);
+}
+.dayNavigator .message {
+    color: rgb(255, 160, 192);
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 20px;
+    text-align: center;
+    padding: 16px 16px 0 16px;
 }
 
 
