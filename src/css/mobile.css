@@ -1,6 +1,6 @@
 @media (max-width: 576px) {
     main section {
-        background-color: blue !important;
+        /* background-color: blue !important; */
     }
     header > .content {
         max-width: calc(100% - 16px * 2);

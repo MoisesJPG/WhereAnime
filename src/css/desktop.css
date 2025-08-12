@@ -1,6 +1,6 @@
 @media (min-width: 769px) {
     main section{
-        background-color: red !important;
+        /* background-color: red !important; */
     }
     header .content nav .switch-nav {
         display: none;
