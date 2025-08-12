@@ -1,0 +1,43 @@
+@media (max-width: 576px) {
+    main section {
+        background-color: blue !important;
+    }
+    header > .content {
+        max-width: calc(100% - 16px * 2);
+    }
+    header > .content nav .switch-nav {
+        display: block;
+    }
+    header > .content nav .content {
+        display: none;
+    }
+    header > .content nav .content.open {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: calc(100% - 16px * 2);
+        position: absolute;
+        left: 0;
+        top: 68px;
+        padding: 16px;
+        background-color: var(--header-color);
+        outline: 1px solid red;
+    }
+    header > .content nav .content.open * {
+        outline: 1px solid red;
+    }
+    header > .content nav .content #searcher {
+        width: 100%;
+        margin-right: 0;
+    }
+    header > .content nav .content #searcher.hidden {
+        width: auto;
+    }
+    header > .content nav .content #searcher input {
+        width: calc(100% - 16px * 2);
+    }
+    header > .content nav .content a {
+        width: calc(100% - 16px * 2);
+        text-align: center;
+    }
+}

@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="./src/css/style.css">
+    <link rel="stylesheet" href="./src/css/desktop.css">
+    <link rel="stylesheet" href="./src/css/mobile.css">
+    <link rel="stylesheet" href="./src/css/tablet.css">
 </head>
 
 <body>
@@ -14,14 +17,20 @@
         <div class="content">
             <h1 class="clickable">WhereAnime</h1>
             <nav>
-                <div id="searcher" class="hidden"><input type="text" placeholder="Buscar..."><button class="clickable">🔎</button></div>
-                <a class="clickable" name="index">Inicio</a>
-                <a class="clickable" name="horary">Horario</a>
-                <a class="clickable" name="repository">Repositorio</a>
-                <!-- <div class="sub"><a>Paginas</a><div></div></div> -->
+                <a class="switch-nav">|||</a>
+                <div class="content">
+                    <div id="searcher" class="hidden">
+                        <input type="text" placeholder="Buscar...">
+                        <button class="clickable">🔎</button>
+                    </div>
+                    <a class="clickable" name="index">Inicio</a>
+                    <a class="clickable" name="horary">Horario</a>
+                    <a class="clickable" name="repository">Repositorio</a>
+                </div>
             </nav>
         </div>
     </header>
+    <!-- <script>alert(window.outerWidth)</script> -->
     <main>
         <div name="home" class="content" style="display: none;">
             <section name="banner">

@@ -2,6 +2,7 @@ import { AdvancedSearcher } from "./advancedSearcher.js";
 import { database } from "./src/js/database.js";
 
 const header = document.querySelector('header');
+const headerSwitchNav = header.querySelector('nav .switch-nav');
 const main = document.querySelector('main');
 const mainContentHome    = main.querySelector('.content[name="home"]');
 const mainContentSearch  = main.querySelector('.content[name="search"]');
@@ -702,6 +703,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     header.querySelector('.content nav a[name="horary"]').onclick = () => { goTo('/horary'); };
     header.querySelector('.content nav a[name="repository"]').onclick = () => { AdvancedSearcher.resetFilter(); goTo('/search'); };
     searcher.querySelector('input').onkeydown = (event) => { if (event.key === "Enter") { headerSearcher(); } }
+    headerSwitchNav.onclick = () => { document.querySelector("header > .content nav > .content").classList.toggle("open"); }
     searcher.querySelector('button').onclick = () => { headerSearcher(); }
     async function headerSearcher() {
         if (!searcher.classList.contains('hidden')) {
