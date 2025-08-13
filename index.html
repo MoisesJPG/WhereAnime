@@ -18,7 +18,7 @@
             <h1 class="clickable">WhereAnime</h1>
             <nav>
                 <a class="switch-nav">|||</a>
-                <div class="content">
+                <div class="content open">
                     <div id="searcher" class="hidden">
                         <input type="text" placeholder="Buscar...">
                         <button class="clickable">🔎</button>
@@ -44,17 +44,11 @@
             </section>
             <section name="recentEpisodes">
                 <h2>Episodios Recientes<span class="timeToRefresh"></span></h2>
-                <div class="content">
-                    <div class="card anime">
-                        <div class="image"><img src="" alt=""></div>
-                        <p class="title"></p>
-                        <div class="hover">
-                            <p>Titulo: Kimetsu no Yaiba Movie: Mugen Jou-hen</p>
-                            <p>Episodios: 1</p>
-                            <p>Fecha: 21/7/2025</p>
-                        </div>
-                    </div>
-                </div>
+                <div class="content grid"></div>
+            </section>
+            <section name="remainingRecentEpisodes">
+                <h2>Episodios Restantes Hoy<span class="timeToRefresh"></span></h2>
+                <div class="content grid"></div>
             </section>
             <section name="recentAnimes">
                 <h2>Animes Recientes<span class="timeToRefresh"></span></h2>
@@ -115,7 +109,7 @@
             </section>
             <section name="results">
                 <h2>Buscando <span></span></h2>
-                <div class="content"></div>
+                <div class="content grid"></div>
                 <div class="navigator"><div class="content"></div></div>
             </section>
         </div>

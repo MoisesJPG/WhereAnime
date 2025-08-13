@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        let placas = ["Placa B.", "Placa M."]
+        let chips = ["Chips B.", "Chips M."]
+        let rams = [1, 2, 3];
+        let list = "";
+        for (const placa of placas) {
+            for (const chip of chips) {
+                for (const ram of rams) {
+                    list += `${placa}%${chip}%${ram}\n`;
+                }
+            }
+        }
+        console.log(list);
+        
+
+    </script>
+</body>
+
+</html>

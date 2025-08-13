@@ -40,4 +40,11 @@
         width: calc(100% - 16px * 2);
         text-align: center;
     }
+    
+    /*========*/
+    /* Tested */
+    /*========*/
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }

@@ -71,6 +71,10 @@ header > .content h1 {
     color: white;
     user-select: none;
 }
+header > .content nav {}
+header > .content nav .switch-nav {
+    display: none;
+}
 header > .content nav .content {
     display: flex;
     gap: 8px;
@@ -92,16 +96,16 @@ header > .content nav #searcher input {
 header > .content nav #searcher input:focus {
     outline: none;
 }
-header .content nav #searcher.hidden input {
+header > .content nav #searcher.hidden input {
     display: none;
 }
-header .content nav #searcher button {
+header > .content nav #searcher button {
     border: 0;
     background-color: transparent;
     width: 32px;
     height: 32px;
 }
-header .content nav a {
+header > .content nav a {
     padding:     8px 16px;
     height:      16px;
     font-size:   16px;
@@ -110,7 +114,7 @@ header .content nav a {
     text-decoration: none;
     color: white;
 }
-header .content nav a:hover {
+header > .content nav a:hover {
     background-color: rgb(128, 128, 128);
     border-radius: 8px;
 }
@@ -121,10 +125,12 @@ header .content nav a:hover {
 /* === MAIN === */
 /* ============ */
 main {
-    min-height: calc(100vh - (64px + 4px) - 0px);
+    min-height: calc(100vh - (64px + 4px) - (48px + 4px));
 }
 main > .content {
-    min-height: calc(100vh - (64px + 4px) - 0px);
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - (64px + 4px) - (48px + 4px));
 }
 main > .content section {
     padding: 32px 0px;
@@ -143,12 +149,6 @@ main > .content section > h2 {
     color:            rgb(255,255,255);
     display: flex;
     justify-content: space-between;
-}
-main > .content section > .content {
-    display: grid;
-    flex-wrap: wrap;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
 }
 
 
@@ -214,14 +214,11 @@ main .content[name="home"] section[name="recentEpisodes"] {
 
 
 
+main .content[name="search"] {
+    background-color: rgb(032, 032, 032);
+}
 main .content[name="search"] section[name="filter"] {
     padding-bottom: 0;
-    /* max-width: calc(var(--max-width) - 4px * 2);
-    border: 4px solid rgb( 32,  32,  48);
-    margin: auto;
-    margin-top: 16px;
-    padding: 0;
-    overflow: hidden; */
 }
 main .content[name="search"] section[name="filter"] .content{
     display: block;
@@ -315,6 +312,10 @@ main .content[name="search"] section[name="filter"] .content nav .advanced detai
 }
 main .content[name="search"] section[name="results"] {
     padding-top: 0;
+}
+
+main .content[name="horary"] {
+    background-color: rgb(032, 032, 032);
 }
 main .content[name="horary"] section[name="dayNavigator"] {
     padding-bottom: 0;
@@ -476,10 +477,6 @@ main .content[name="episode"] section[name="episodeLinks"]  {
     box-shadow: 0px 0px 16px 8px rgb(000, 000, 000);
 }
 main .content[name="anime"] section[name="episodeList"] .content {}
-@media screen and (max-width: calc(256px * 4 + 16px * 3)) { main section > .content { grid-template-columns: repeat(3, 1fr); } }
-@media screen and (max-width: calc(256px * 3 + 16px * 2)) { main section > .content { grid-template-columns: repeat(2, 1fr); } }
-@media screen and (max-width: calc(256px * 2 + 16px * 1)) { main section > .content { grid-template-columns: repeat(1, 1fr); } }
-
 
 
 /* ============== */
@@ -731,3 +728,13 @@ body:not(.ac) .card.hentai .hover     { filter: blur( 4px); z-index: 1; }
 
 .clickable { user-select: none; cursor: pointer; }
 .clickable:focus { user-select: none; cursor: inherit; }
+
+/*========*/
+/* Tested */
+/*========*/
+.grid {
+    display: grid;
+    flex-wrap: wrap;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}

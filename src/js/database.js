@@ -77,6 +77,25 @@ export class database {
         const randomIndex = Math.floor(Math.random() * animes.length);
         return animes[randomIndex];
     }
+    static V2_getRemainingRecentEpisodes() {
+        let animes = this.V2_getAnimes();
+        let today = new Date(Date.now()).toLocaleDateString();
+        console.log(today);
+
+        animes = animes.filter(anime => {
+            return new Date((anime.episodes.length > 0 ? anime.episodes[0].timestamp || 0 : 0) + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString() === today
+        })
+        let response = animes.map(anime => { return {
+            animeId: anime.id,
+            animeType: anime.type,
+            thumbnail: anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail,
+            title: anime.titles[0],
+            episode: anime.episodes[0].episode + 1,
+            timestamp: anime.episodes[0].timestamp + (7 * 24 * 60 * 60 * 1000),
+        }})
+        return response
+        
+    }
     static V2_getRecentEpisodes(limit = 20) {
         try {
             let result = this.V2_getAnimes();
@@ -102,6 +121,24 @@ export class database {
             return [];
         }
     }
+    static V2_getRecentAnimes(limit = 20) {
+        let result = this.V2_getAnimes();
+        result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
+        result.sort((a, b) => b.timestamp - a.timestamp)
+        let response = result.slice(0, limit).map(anime => {
+            return {
+                id: anime.id,
+                title: anime.titles[0],
+                type: anime.type,
+                thumbnail: anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail,
+                timestamp: anime.timestamp,
+                episodeCount: anime.episodes.length,
+                otherTitles: anime.titles.slice(1)
+            }
+        })
+        return response;
+    }
+
     static #V2_getAnimesByDay(day) {
         let dayMap = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         let animes = this.V2_getAnimes();
@@ -134,23 +171,6 @@ export class database {
     static V2_getSundayAnimes()    { return this.#V2_getAnimesByDay("Sunday"   ); }
 
     
-    static V2_getRecentAnimes(limit = 20) {
-        let result = this.V2_getAnimes();
-        result = result.filter(anime => anime.pages.some(p => p.page.toLowerCase() === database.config.page || database.config.page === "all"));
-        result.sort((a, b) => b.timestamp - a.timestamp)
-        let response = result.slice(0, limit).map(anime => {
-            return {
-                id: anime.id,
-                title: anime.titles[0],
-                type: anime.type,
-                thumbnail: anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail,
-                timestamp: anime.timestamp,
-                episodeCount: anime.episodes.length,
-                otherTitles: anime.titles.slice(1)
-            }
-        })
-        return response;
-    }
     static V2_findAnimeById(id) {
         return this.#data.filter(anime => anime.id === id)[0];
     }

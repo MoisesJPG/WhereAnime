@@ -10,10 +10,7 @@
     }
     header > .content nav .content {
         display: none;
-    }
-    header > .content nav .content.open {
-        display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         width: calc(100% - 16px * 2);
         position: absolute;
@@ -22,22 +19,30 @@
         padding: 16px;
         background-color: var(--header-color);
         outline: 1px solid red;
+        flex-wrap: wrap;
     }
-    header > .content nav .content.open * {
-        outline: 1px solid red;
+    header > .content nav .content.open {
+        display: flex;
     }
     header > .content nav .content #searcher {
         width: 100%;
-        margin-right: 0;
+        margin: 0;
     }
     header > .content nav .content #searcher.hidden {
         width: auto;
+        margin: 0 calc(50% - 16px);
     }
     header > .content nav .content #searcher input {
         width: calc(100% - 16px * 2);
     }
     header > .content nav .content a {
-        width: calc(100% - 16px * 2);
+        width: calc((100% - 16px * 2) / 3 - 16px * 2);
         text-align: center;
+    }
+    /*========*/
+    /* Tested */
+    /*========*/
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }

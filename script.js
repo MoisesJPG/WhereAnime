@@ -27,21 +27,35 @@ const dayMap = {
     0: {en: "sunday", es: "Domingo"},
 };
 
-const blobs = {}
+const blobs = {
+    "unknown" : "https://i.makeagif.com/media/4-15-2024/IoMMB_.gif"
+}
+const permOrigings = [
+    "whereanime.github.io",
+]
 async function blobImage(imageUrl) {
-    if(blobs[imageUrl]) return blobs[imageUrl];
-    const response = await fetch(imageUrl);
-    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-    blobs[imageUrl] = URL.createObjectURL(await response.blob());
-    return blobs[imageUrl];
+    try {
+        if(blobs[imageUrl]) return blobs[imageUrl];
+        if(permOrigings.includes(location.host)){
+            const response = await fetch(imageUrl);
+            if (response.ok) { 
+                blobs[imageUrl] = URL.createObjectURL(await response.blob());
+                return blobs[imageUrl];
+            }
+        }else{
+            return imageUrl
+        }
+    } catch (error) { 
+        return blobs.unknown;
+    }
 }
 async function thumbnailAnimeImage(animeId, thumbnail) {
-    if(true) return thumbnail;
+    if(true) return await blobImage(thumbnail);
     if(location.host === "localhost") return await blobImage(`/images/thumbnail/${animeId}.webp`);
     return await blobImage(`https://raw.githubusercontent.com/WhereAnime/images/refs/heads/main/thumbnail/${animeId}.webp`);
 }
 async function coverAnimeImage(animeId, thumbnail) {
-    if(true) return thumbnail;
+    if(true) return await blobImage(thumbnail);
     if(location.host === "localhost") return await blobImage(`/images/cover/${animeId}.webp`);
     return await blobImage(`https://raw.githubusercontent.com/WhereAnime/images/refs/heads/main/cover/${animeId}.webp`);
 }
@@ -52,8 +66,7 @@ async function loadDatabase() {
 const intervals = {}
 function goTo(url) {
     console.log(url);
-    
-    for(const blobUrl in blobs) { URL.revokeObjectURL(blobs[blobUrl]) }
+    for(const blobUrl in blobs) { if(blobUrl !== "unknown") { URL.revokeObjectURL(blobs[blobUrl]); } }
     scrollTo(0, 0);
     const base = window.location.origin; // Base actual
     const newUrl = new URL(url, base);   // Construye URL absoluta
@@ -131,6 +144,7 @@ function preparegoTo(newUrl = location) {
         console.log("||||| HOME PAGE |||||");
         document.title = `WhereAnime`;
         const banner = mainContentHome.querySelector('section[name="banner"] .content');
+        const remainingRecentEpisodes = mainContentHome.querySelector('section[name="remainingRecentEpisodes"] .content');
         const recentEpisodes = mainContentHome.querySelector('section[name="recentEpisodes"] .content');
         const recentAnimes = mainContentHome.querySelector('section[name="recentAnimes"] .content');
         async function refresh() {
@@ -150,6 +164,30 @@ function preparegoTo(newUrl = location) {
                 banner.querySelector(`.genres`).appendChild(span);
             }
             banner.querySelector(`.see`).onclick = () => goTo(`/anime/${encodeURIComponent(bannerAnime.titles[0])}/1`);
+
+            const remainingEpisodes = database.V2_getRemainingRecentEpisodes();
+            console.log(remainingEpisodes);
+            
+            for (let i = 0; i < remainingEpisodes.length; i++) {
+                const episode = remainingEpisodes[i];
+                const card = document.createElement("div");
+                card.className = `card ${episode.animeType.toLowerCase().split(" ")[0]}`
+                card.innerHTML = `
+                    <div class="image"><img src="${await thumbnailAnimeImage(episode.animeId, episode.thumbnail)}" alt="${episode.title}"></div>
+                    <p class="title">${episode.title}</p>
+                    <p class="episode">${episode.episode}</p>
+                    <div class="hover">
+                        <p>Titulo: ${episode.title}</p>
+                        <p>Episodio: ${episode.episode}</p>
+                        <p>Fecha: ${new Date(episode.timestamp).toLocaleDateString()}</p>
+                    </div>
+                `;
+                if (remainingRecentEpisodes.children[i]) {
+                    remainingRecentEpisodes.replaceChild(card, remainingRecentEpisodes.children[i]);
+                } else {
+                    remainingRecentEpisodes.appendChild(card);
+                }
+            }
 
             const episodes = database.V2_getRecentEpisodes();
             for (let i = 0; i < episodes.length; i++) {
@@ -196,6 +234,7 @@ function preparegoTo(newUrl = location) {
                     recentAnimes.appendChild(card);
                 }
             }
+
         }
         intervals["timeToRefresh"] = setInterval(() => {
             document.querySelectorAll('.timeToRefresh').forEach(el => {

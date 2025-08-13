@@ -2,11 +2,11 @@
     main section{
         /* background-color: red !important; */
     }
-    header .content nav .switch-nav {
-        display: none;
-    }
-    header .content nav .content{
-        display: flex;
+    /*========*/
+    /* Tested */
+    /*========*/
+    .grid {
+        grid-template-columns: repeat(4, 1fr);
     }
 }
   
