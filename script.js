@@ -166,10 +166,9 @@ function preparegoTo(newUrl = location) {
             banner.querySelector(`.see`).onclick = () => goTo(`/anime/${encodeURIComponent(bannerAnime.titles[0])}/1`);
 
             const remainingEpisodes = database.V2_getRemainingRecentEpisodes();
-            console.log(remainingEpisodes);
-            
-            for (let i = 0; i < remainingEpisodes.length; i++) {
-                const episode = remainingEpisodes[i];
+            let i = 0;
+            for (let o = 0; o < remainingEpisodes.length; o++, i++) {
+                const episode = remainingEpisodes[o];
                 const card = document.createElement("div");
                 card.className = `card ${episode.animeType.toLowerCase().split(" ")[0]}`
                 card.innerHTML = `
@@ -182,11 +181,15 @@ function preparegoTo(newUrl = location) {
                         <p>Fecha: ${new Date(episode.timestamp).toLocaleDateString()}</p>
                     </div>
                 `;
-                if (remainingRecentEpisodes.children[i]) {
-                    remainingRecentEpisodes.replaceChild(card, remainingRecentEpisodes.children[i]);
+                if (remainingRecentEpisodes.children[o]) {
+                    remainingRecentEpisodes.replaceChild(card, remainingRecentEpisodes.children[o]);
                 } else {
                     remainingRecentEpisodes.appendChild(card);
                 }
+            }
+            for (let f = remainingRecentEpisodes.childElementCount - 1; f >= i; f--) {
+                remainingRecentEpisodes.children[f].remove();
+                
             }
 
             const episodes = database.V2_getRecentEpisodes();

@@ -1,6 +1,6 @@
 :root {
-    /* --max-width: calc(256px * 4 + 16px * 3); */
-    --max-width: calc(256px * 4);
+    --max-width: calc(256px * 4 + 16px * 3);
+    /* --max-width: calc(256px * 4); */
     --header-color: rgb(016, 016, 016);
 }
 * {
@@ -134,13 +134,16 @@ main > .content {
 }
 main > .content section {
     padding: 32px 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     background-color: rgb(032, 032, 032);
 }
 main > .content section > * {
     width: calc(100% - 16px * 2);
     max-width: calc(var(--max-width) - 16px * 2);
     margin: auto;
-    padding: 16px;
+    padding: 0 16px;
 }
 main > .content section > h2 {
     height:      24px;
@@ -334,8 +337,10 @@ main .content[name="episode"] section[name="animeData"] {
 }
 main .content[name="anime"]   section[name="animeData"] .content ,
 main .content[name="episode"] section[name="animeData"] .content {
+    display: grid;
+    gap: 32px;
     background-color: transparent;
-    padding: 16px 16px 32px 16px;
+    padding: 16px 16px 16px 16px;
     max-width: calc(var(--max-width) - 16px * 2);
     margin: auto;
     grid-template-columns: calc((100% - 16px * 3) / 4) auto;
