@@ -142,7 +142,7 @@ export class database {
     static #V2_getAnimesByDay(day) {
         let dayMap = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         let animes = this.V2_getAnimes();
-        animes = animes.filter(anime => anime.status === "En Emision" || anime.status === "Desconocido");
+        animes = animes.filter(anime => anime.status === "En Emision");
         animes = animes.filter(anime => {
             const date = new Date((anime.episodes.length > 0 ? anime.episodes[0].timestamp : 0) + (7 * 24 * 60 * 60 * 1000));
             return date.getDay() === dayMap.indexOf(day)
