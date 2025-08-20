@@ -12,7 +12,7 @@ const PORT = 3001;
 app.use(cors());
 
 // Servir archivos estáticos (opcional, para la web)
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '.')));
 
 // Conectar a la base de datos
 const db = new sqlite3.Database('./database.db', (err) => {
@@ -22,12 +22,20 @@ const db = new sqlite3.Database('./database.db', (err) => {
         console.log("Conectado a database.db");
     }
 });
-const json = JSON.parse(fs.readFileSync('../src/db/database.json', 'utf8')) || [];
+const json = JSON.parse(fs.readFileSync('../../database/database.json', 'utf8')) || [];
 console.log("JSON:", json.length);
 
 function runAsync(sql, params = []) {
     return new Promise((resolve, reject) => {
         db.run(sql, params, function (err) {
+            if (err) return reject(err);
+            resolve(this); // `this.lastID` disponible aquí
+        });
+    });
+}
+function execAsync(sql) {
+    return new Promise((resolve, reject) => {
+        db.exec(sql, function (err) {
             if (err) return reject(err);
             resolve(this); // `this.lastID` disponible aquí
         });
@@ -45,8 +53,8 @@ function queryAsync(sql, params = []) {
 
 async function verifyAnime(anime_id) {
     try {
-        await verifyEpisodes(anime_id);
-        await verifyPages(anime_id);
+        // await verifyEpisodes(anime_id);
+        // await verifyPages(anime_id);
         return true;
     } catch (err) {
         console.error("Error al verificar episodios:", err.message);
@@ -61,7 +69,7 @@ async function verifyEpisodes(anime_id) {
             return false;
         }
         for (const episode of episodes) {
-            await verifyEpisode(episode.id);
+            // await verifyEpisode(episode.id);
         }
         return true;
     } catch (err) {
@@ -96,7 +104,7 @@ async function verifyPages(anime_id) {
             return false;
         }
         for (const page of pages) {
-            await verifyPage(page.id);
+            // await verifyPage(page.id);
         }
         return true;
     } catch (err) {
@@ -131,23 +139,32 @@ async function verifyPage(page_id) {
     }
 }
 
-async function addAnime(titles, type, pages, episodes, timestamp) {
+async function addAnimeFromJSON(data) {
     try {
-        // Verificar si el anime ya existe
-        const existingAnime = await queryAsync(`SELECT * FROM animes a LEFT JOIN titles t ON a.id = t.anime_id WHERE t.title LIKE ?`, [`%${titles[0]}%`]);
-        let animeId = existingAnime[0] ? existingAnime[0].id : null;
-        if (existingAnime.length > 0) {
-            // console.log(`Ya existe el anime '${titles[0]}'`);
+        const existingAnime = await queryAsync(`
+            SELECT * FROM animes a 
+            LEFT JOIN titles t ON a.id = t.anime_id 
+            WHERE t.title = ?
+        `, [data.titles[0]]);
+
+        let animeId = existingAnime.length === 1 ? existingAnime[0].id : null;
+
+        if (animeId) {
+            console.log(`Ya existe el anime '${data.titles[0]}'`);
         } else {
-            const isoDate = new Date(timestamp).toISOString().slice(0, 19).replace('T', ' ');
-            const result = await runAsync(`INSERT INTO animes (type, timestamp) VALUES (?, ?)`, [type, isoDate]);
+            const isoDate = new Date(data.timestamp).toISOString().slice(0, 19).replace('T', ' ');
+            const result = await runAsync(
+                `INSERT INTO animes (type, status, lang, timestamp) VALUES (?, ?, ?, ?)`,
+                [data.type, data.status, data.lang, isoDate]
+            );
             animeId = result.lastID;
-            // console.log(`Se ha añadido el anime '${titles[0]}'`);
+            console.log(`Se ha añadido el anime '${data.titles[0]}'`);
         }
 
-        for (const title of titles) { await addTitle(animeId, title); }
-        for (const page of pages) { await addPage(animeId, page.page, page.thumbnail, page.datetime); }
-        for (const episode of episodes) { await addEpisode(animeId, episode.episode, episode.page, episode.url, timestamp); }
+        for (const title of data.titles) { await addTitle(animeId, title); }
+        for (const page of data.pages) { await addPage(animeId, page.page, page.thumbnail, page.datetime); }
+        for (const episode of data.episodes) { await addEpisode(animeId, episode.episode, episode.page, episode.url, timestamp); }
+        for (const related of data.related) { await addRelated(animeId, related.title, related.relation); }
         return animeId;
     } catch (err) {
         console.error("Error al insertar anime:", err.message);
@@ -210,40 +227,90 @@ async function addLink(anime_id, episode_id, page, url, timestamp) {
         console.error("Error al insertar enlace:", err.message);
     }
 }
-async function init() {
-    // Eliminar tablas si existen
-    // await runAsync(`DROP TABLE IF EXISTS links`);
-    // await runAsync(`DROP TABLE IF EXISTS episodes`);
-    // await runAsync(`DROP TABLE IF EXISTS titles`);
-    // await runAsync(`DROP TABLE IF EXISTS page`);
-    // await runAsync(`DROP TABLE IF EXISTS animes`);
+async function addRelated(anime_id, title, relation) {
+    try {
+        // Buscar si ya existe esa relación
+        const existingRelation = await queryAsync(`
+            SELECT * FROM related 
+            WHERE anime_id = ? 
+            AND related_id = (SELECT anime_id FROM titles WHERE title = ? LIMIT 1)
+        `, [anime_id, title]);
 
-    // Crear tablas si no existen
-    await runAsync(`
+        if (existingRelation.length < 1) {
+            // Obtener el id relacionado desde titles
+            const relatedAnime = await queryAsync(
+                `SELECT anime_id FROM titles WHERE title = ? LIMIT 1`,
+                [title]
+            );
+
+            if (relatedAnime.length > 0) {
+                const related_id = relatedAnime[0].anime_id;
+
+                await runAsync(
+                    `INSERT INTO related (anime_id, related_id, relation) VALUES (?, ?, ?)`,
+                    [anime_id, related_id, relation]
+                );
+            }
+        }
+    } catch (err) {
+        console.error("Error al insertar relación:", err.message);
+    }
+}
+async function init() {
+    // Eliminar
+    await execAsync(`
+        DROP TABLE IF EXISTS related;
+        DROP TABLE IF EXISTS links;
+        DROP TABLE IF EXISTS episodes;
+        DROP TABLE IF EXISTS pages;
+        DROP TABLE IF EXISTS titles;
+        DROP TABLE IF EXISTS genres;
+        DROP TABLE IF EXISTS animes;
+        
+        DROP TRIGGER IF EXISTS update_episode_timestamp_after_link_insert;
+        DROP TRIGGER IF EXISTS update_episode_timestamp_after_link_update;
+        DROP TRIGGER IF EXISTS update_anime_timestamp_after_page_insert;
+        DROP TRIGGER IF EXISTS update_anime_timestamp_after_page_update;
+    
+        DROP VIEW IF EXISTS anime_view;
+        DROP VIEW IF EXISTS genre_list;
+    `);
+    // Crear tablas
+    await execAsync(`
         CREATE TABLE IF NOT EXISTS animes (
             id INTEGER PRIMARY KEY,
+            status TEXT,
             type TEXT,
+            lang TEXT,
             timestamp TIMESTAMP
-        )
-    `);
-    await runAsync(`
+        );
+        CREATE TABLE IF NOT EXISTS genres (
+            id INTEGER PRIMARY KEY,
+            anime_id INTEGER,
+            genre TEXT,
+            FOREIGN KEY (anime_id) REFERENCES animes(id)
+        );
         CREATE TABLE IF NOT EXISTS titles (
             id INTEGER PRIMARY KEY,
             anime_id INTEGER,
             title TEXT,
             FOREIGN KEY (anime_id) REFERENCES animes(id)
-        )
-    `);
-    await runAsync(`
+        );
+        CREATE TABLE IF NOT EXISTS pages (
+            id INTEGER PRIMARY KEY,
+            anime_id INTEGER,
+            page TEXT,
+            thumbnail TEXT,
+            timestamp TIMESTAMP,
+            FOREIGN KEY (anime_id) REFERENCES animes(id)
+        );
         CREATE TABLE IF NOT EXISTS episodes (
             id INTEGER PRIMARY KEY,
             anime_id INTEGER,
             episode NUMBER,
             timestamp TIMESTAMP,
             FOREIGN KEY (anime_id) REFERENCES animes(id)
-        )
-    `);
-    await runAsync(`
+        );
         CREATE TABLE IF NOT EXISTS links (
             id INTEGER PRIMARY KEY,
             episode_id INTEGER,
@@ -251,38 +318,49 @@ async function init() {
             url TEXT,
             timestamp TIMESTAMP,
             FOREIGN KEY (episode_id) REFERENCES episodes(id)
-        )
-    `);
-    await runAsync(`
-        CREATE TABLE IF NOT EXISTS page (
+        );
+        CREATE TABLE IF NOT EXISTS related (
             id INTEGER PRIMARY KEY,
             anime_id INTEGER,
-            page TEXT,
-            thumbnail TEXT,
-            timestamp TIMESTAMP,
-            FOREIGN KEY (anime_id) REFERENCES animes(id)
-        )
+            related_id INTEGER,
+            relation TEXT,
+            FOREIGN KEY (anime_id) REFERENCES animes(id),
+            FOREIGN KEY (related_id) REFERENCES animes(id)
+        );
     `);
-    await runAsync(`
-        DROP TRIGGER IF EXISTS update_episode_timestamp_after_link_insert;
-        DROP TRIGGER IF EXISTS update_episode_timestamp_after_link_update;
-        DROP TRIGGER IF EXISTS update_anime_timestamp_after_page_insert;
-        DROP TRIGGER IF EXISTS update_anime_timestamp_after_page_update;
-    `);
-    await runAsync(`DROP VIEW IF EXISTS anime_view;`);
-    await runAsync(`
+    // Crear vista
+    await execAsync(`
+        CREATE VIEW genre_list AS
+        SELECT DISTINCT g.genre
+        FROM genres g
+        ORDER BY g.genre ASC;
+
         CREATE VIEW anime_view AS
         SELECT
             a.id,
-            a.type,
+
             -- Títulos agrupados
             (SELECT json_group_array(t.title) FROM titles t WHERE t.anime_id = a.id) AS titles,
+            
+            -- Tipo
+            a.type,
+
+            -- Estado
+            a.status,
+
+            -- Idioma
+            a.lang,
+            
+            -- Generos
+            (SELECT json_group_array(g.genre) FROM genres g WHERE g.anime_id = a.id) AS genres,
+
             -- Páginas agrupadas
             (SELECT json_group_array(json_object(
                 'page', p.page,
                 'thumbnail', p.thumbnail,
                 'timestamp', p.timestamp
-            )) FROM page p WHERE p.anime_id = a.id) AS pages,
+            )) FROM pages p WHERE p.anime_id = a.id) AS pages,
+
             -- Episodios con sus links anidados
             (SELECT json_group_array(json_object(
                 'episode', e.episode,
@@ -297,9 +375,22 @@ async function init() {
                     WHERE l.episode_id = e.id
                 )
             )) FROM episodes e WHERE e.anime_id = a.id) AS episodes,
+            
+            -- Páginas agrupadas
+            (SELECT json_group_array(json_object(
+                'id', r.related_id,
+                'relation', r.relation
+            )) FROM related r WHERE r.anime_id = a.id) AS related,
+
+            -- Timestamp
             a.timestamp
-        FROM animes a;
+        FROM animes a
+        ORDER BY a.timestamp DESC;
     `);
+    console.log("Tablas creadas");
+    return
+    console.log("Triggers antiguos eliminados");
+
     // Crear triggers
     await runAsync(`
         -- Trigger después de insertar un link
@@ -342,8 +433,7 @@ async function init() {
                     WHERE l.page = NEW.page AND e.anime_id = (SELECT anime_id FROM episodes WHERE id = NEW.episode_id)
                 );
         END;
-    `);
-    await runAsync(`
+        
         -- Trigger después de insertar una page
         CREATE TRIGGER IF NOT EXISTS update_anime_timestamp_after_page_insert
         AFTER INSERT ON page
@@ -370,10 +460,129 @@ async function init() {
             WHERE id = NEW.anime_id;
         END;
     `);
-    console.log("Tablas creadas");
 }
-async function main() {
-    await init();
+
+async function newAnimeFromJSON(data) {
+    try {
+        const exist_anime = await queryAsync(`SELECT * FROM titles WHERE title = ?`, [data.titles[0]]);
+        if(exist_anime.length === 1){
+            console.log(`Ya existe el anime '${data.titles[0]}'`);
+        } else {
+            const result = await runAsync(
+                `INSERT INTO animes (lang, type, status, timestamp) VALUES (?, ?, ?, ?)`, 
+                [data.lang, data.type, data.status, data.timestamp]
+            );
+            for(const page of data.pages){ await newAnimePageFromJSON(result.lastID, page); }
+            for(const title of data.titles){ await newAnimeTitleFromJSON(result.lastID, title); }
+            for(const genre of data.genres){ await newAnimeGenreFromJSON(result.lastID, genre); }
+            for(const episode of data.episodes){ await newAnimeEpisodeFromJSON(result.lastID, episode); }
+        }
+    } catch (err) {
+        console.error("Error al insertar anime:", err.message);
+        throw err;
+    }
+}
+async function newAnimeTitleFromJSON(anime_id, title) {
+    try {
+        await runAsync(`INSERT INTO titles (anime_id, title) VALUES (?, ?)`, [anime_id, title]);
+    } catch (err) {
+        console.error("Error al insertar:", err.message);
+        throw err;
+    }
+}
+async function newAnimeGenreFromJSON(anime_id, genre) {
+    try {
+        await runAsync(`INSERT INTO genres (anime_id, genre) VALUES (?, ?)`, [anime_id, genre]);
+    } catch (err) {
+        console.error("Error al insertar:", err.message);
+        throw err;
+    }
+}
+async function newAnimePageFromJSON(anime_id, page) {
+    try {
+        await runAsync(
+            `INSERT INTO pages (anime_id, page, thumbnail, timestamp) VALUES (?, ?, ?, ?)`, 
+            [anime_id, page.page, page.thumbnail, page.timestamp]
+        );
+    } catch (err) {
+        console.error("Error al insertar:", err.message);
+        throw err;
+    }
+}
+async function newAnimeEpisodeFromJSON(anime_id, req_episode) {
+    try {
+        const episode = await runAsync(
+            `INSERT INTO episodes (anime_id, episode, timestamp) VALUES (?, ?, ?)`, 
+            [anime_id, req_episode.episode, req_episode.timestamp]
+        );
+        for(const url of req_episode.urls){ await newAnimeEpisodeUrlFromJSON(episode.lastID, url); }
+    } catch (err) {
+        console.error("Error al insertar anime:", err.message);
+        throw err;
+    }
+}
+async function newAnimeEpisodeUrlFromJSON(episode_id, url) {
+    try {
+        await runAsync(
+            `INSERT INTO links (episode_id, page, url, timestamp) VALUES (?, ?, ?, ?)`, 
+            [episode_id, url.page, url.url, url.timestamp]
+        );
+    } catch (err) {
+        console.error("Error al insertar anime:", err.message);
+        throw err;
+    }
+}
+async function newAnimeRelatedFromJSON(anime_title, related_title, relation) {
+    try {
+        const anime = await queryAsync("SELECT * FROM titles WHERE title = ?", [anime_title])
+        if(anime.length < 1) return;
+        const related = await queryAsync("SELECT * FROM titles WHERE title = ?", [related_title])
+        if(related.length < 1) return;
+
+        await runAsync(
+            `INSERT INTO related (anime_id, related_id, relation) VALUES (?, ?, ?)`, 
+            [anime[0].anime_id, related[0].anime_id, relation]
+        );
+    } catch (err) {
+        console.error("Error al insertar:", err.message);
+        throw err;
+    }
+}
+async function importDatabaseFromJSON() {
+    async function importAnimes(start = 0, end = 10) {
+        let length = json.length;
+        for (let index = Math.min(json.length - 1, start); index < Math.min(json.length - 1, end); index++) {
+            console.log(`Importando anime ${index}/${length}`);
+            
+            const anime = json[index];
+            await newAnimeFromJSON({ 
+                titles: anime.titles,
+                genres: anime.genres,
+                type: anime.type,
+                lang: anime.lang,
+                status: anime.status,
+                timestamp: anime.timestamp,
+                pages: anime.pages,
+                episodes: anime.episodes
+            });
+        }
+    }
+    async function importAnimeRelated(start = 0, end = 10){
+        let length = json.length;
+        for (let index = Math.min(json.length - 1, start); index < Math.min(json.length - 1, end); index++) {
+            console.log(`Importando anime.related ${index}/${length}`);
+            const anime = json[index];
+            for (let j = 0; j < anime.related.length; j++) {
+                const related = anime.related[j];
+                await newAnimeRelatedFromJSON(anime.titles[0], related.title, related.relation);
+            }
+        }
+    }
+    let s = 200;
+    let e = 300;
+    await importAnimes(s,e);
+    await importAnimeRelated(s,e);
+    return;
     let max = 100;
     let loops = Math.ceil(json.length / max);
 
@@ -408,7 +617,7 @@ async function main() {
             console.log("Procesando anime Nº" + i, ":", anime.titles?.[0]);
 
             promises.push(
-                addAnime(anime.titles, anime.type, anime.pages, anime.episodes, anime.timestamp)
+                addAnimeFromJSON(anime.titles, anime.type, anime.pages, anime.episodes, anime.timestamp)
                     .then(id => {
                         console.log(`[${batchIndex}/${loops} ${++cur}/${end - start}] Anime Nº${i}: ${anime.titles?.[0]} ID: ${id}`);
                     })
@@ -421,6 +630,10 @@ async function main() {
         await Promise.all(promises);
     }
     console.log("Todos los animes procesados.");
+}
+async function main() {
+    await init();
+    importDatabaseFromJSON();
 }
 main();
 

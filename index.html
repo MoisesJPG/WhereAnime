@@ -33,7 +33,7 @@
     <!-- <script>alert(window.outerWidth)</script> -->
     <main>
         <div name="home" class="content" style="display: none;">
-            <section name="banner">
+            <section class="banner" name="banner">
                 <div class="content">
                     <div class="data">
                         <h2 class="title"></h2>
@@ -41,18 +41,27 @@
                         <p class="see">Ver ahora</p>
                     </div>
                 </div>
+                <div class="background">
+                    <img src="" alt="">
+                </div>
             </section>
             <section name="recentEpisodes">
-                <h2>Episodios Recientes<span class="timeToRefresh"></span></h2>
-                <div class="content grid"></div>
+                <div class="content">
+                    <h2>Episodios Recientes<span class="timeToRefresh"></span></h2>
+                    <div class="grid"></div>
+                </div>
             </section>
             <section name="remainingRecentEpisodes">
-                <h2>Episodios Restantes Hoy<span class="timeToRefresh"></span></h2>
-                <div class="content grid"></div>
+                <div class="content">
+                    <h2>Episodios Restantes Hoy<span class="timeToRefresh"></span></h2>
+                    <div class="grid"></div>
+                </div>
             </section>
             <section name="recentAnimes">
-                <h2>Animes Recientes<span class="timeToRefresh"></span></h2>
-                <div class="content grid"></div>
+                <div class="content">
+                    <h2>Animes Recientes<span class="timeToRefresh"></span></h2>
+                    <div class="grid"></div>
+                </div>
             </section>
         </div>
         <div name="search" class="content" style="display: none;">
@@ -108,15 +117,17 @@
                 </div>
             </section>
             <section name="results">
-                <h2>Buscando <span></span></h2>
-                <div class="content grid"></div>
-                <div class="navigator"><div class="content"></div></div>
+                <div class="content">
+                    <h2>Buscando <span></span></h2>
+                    <div class="grid"></div>
+                    <div class="navigator"><div class="content"></div></div>
+                </div>
             </section>
         </div>
         <div name="horary" class="content" style="display: none;">
             <section name="dayNavigator">
-                <div class="dayNavigator">
-                    <div class="content">
+                <div class="content">
+                    <div class="dayNavigator">
                         <a class="button" name="monday">Lunes</a>
                         <a class="button" name="tuesday">Martes</a>
                         <a class="button" name="wednesday">Miercoles</a>
@@ -129,13 +140,15 @@
                 </div>
             </section>
             <section name="animeList">
-                <h2>Horario</h2>
-                <div class="content grid"></div>
-                <div class="navigator"><div class="content"></div></div>
+                <div class="content">
+                    <h2>Horario</h2>
+                    <div class="grid"></div>
+                    <div class="navigator"><div class="content"></div></div>
+                </div>
             </section>
         </div>
         <div name="anime" class="content" style="display: none;">
-            <section name="animeData">
+            <section class="details" name="animeData">
                 <div class="content">
                     <div class="col1">
                         <div class="image">
@@ -156,19 +169,25 @@
                             <div class="row"><span class="title">Proximo episodio: </span><p class="clickable nextDate   "></p></div>
                             <div class="row"><span class="title">Ultima episodio:  </span><p class="          lastDate   "></p></div>
                             <div class="row"><span class="title">Fecha de estreno: </span><p class="          firstDate  "></p></div>
-                            <div class="row"><span class="title">Otros titulos:    </span><p class="          otherTitles"></p></div>
+                            <div class="row"><span class="title">Relacionados:     </span><p class="clickable related     col-list"></p></div>
+                            <div class="row"><span class="title">Otros titulos:    </span><p class="          otherTitles col-list"></p></div>
                         </div>
                     </div>
                 </div>
+                <div class="background">
+                    <img src="" alt="">
+                </div>
             </section>
             <section name="episodeList">
-                <h2>Lista de episodios</h2>
-                <div class="content grid"></div>
-                <div class="navigator"><div class="content"></div></div>
+                <div class="content">
+                    <h2>Lista de episodios</h2>
+                    <div class="grid"></div>
+                    <div class="navigator"><div class="content"></div></div>
+                </div>
             </section>
         </div>
         <div name="episode" class="content" style="display: none;">
-            <section name="animeData">
+            <section class="details" name="animeData">
                 <div class="content">
                     <div class="col1">
                         <div class="clickable image">
@@ -180,24 +199,29 @@
                         <div class="data">
                             <h2 class="title"></h2>
                             <h3 class="subtitle">Informacion general</h3>
-                            <div class="row"><span class="title">Tipo:             </span><p class="clickable type       "></p></div>
-                            <div class="row"><span class="title">Episodio:         </span><p class="          episode    "></p></div>
-                            <div class="row"><span class="title">Idioma:           </span><p class="clickable lang       "></p></div>
-                            <div class="row"><span class="title">Fecha de estreno: </span><p class="          firstDate  "></p></div>
-                            <div class="row"><span class="title">Otros titulos:    </span><p class="          otherTitles"></p></div>
+                            <div class="row"><span class="title">Tipo:             </span><p class="clickable type                "></p></div>
+                            <div class="row"><span class="title">Episodio:         </span><p class="          episode             "></p></div>
+                            <div class="row"><span class="title">Idioma:           </span><p class="clickable lang                "></p></div>
+                            <div class="row"><span class="title">Fecha de estreno: </span><p class="          firstDate           "></p></div>
+                            <div class="row"><span class="title">Otros titulos:    </span><p class="          otherTitles col-list"></p></div>
                         </div>
                     </div>
                 </div>
+                <div class="background">
+                    <img>
+                </div>
             </section>
             <section name="episodeLinks">
-                <h2>Lista de enlaces</h2>
-                <div class="content grid"></div>
-                <div class="navigator"><div class="content"></div></div>
+                <div class="content">
+                    <h2>Lista de enlaces</h2>
+                    <div class="grid"></div>
+                    <div class="navigator"><div class="content"></div></div>
+                </div>
             </section>
         </div>
     </main>
     <footer></footer>
-    <div id="background"><img></div>
+    <!-- <div id="background"><img></div> -->
     <style id="custom-root"></style>
     <script>
         const custom_root = document.querySelector('#custom-root');

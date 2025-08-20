@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>SQLite sin Backend (con fetch)</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.js"></script>
+	<style>
+		body {
+			font-family: sans-serif;
+		}
+
+		* {
+			padding: 0;
+			margin: 0;
+		}
+
+		main {
+			display: grid;
+			grid-template-columns: 25% 75%;
+		}
+
+		#left {
+			padding: 16px;
+			max-height: calc(100vh - 16px * 2);
+			overflow-y: scroll;
+		}
+
+		#right {
+			padding: 16px;
+		}
+
+		table,
+		th,
+		td {
+			border: 1px solid #ccc;
+			border-collapse: collapse;
+			padding: 8px;
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<section id="left">
+			<h3>Animes</h3>
+			<ul class="list"></ul>
+		</section>
+		<section id="right">
+			<h2>Consulta de base de datos SQLite cargada con fetch</h2>
+			<label for="query">Consulta SQL:</label>
+			<input type="text" id="query" value="SELECT * FROM anime_view LIMIT 10;" style="width: 80%;" />
+			<button onclick="runQuery()">Ejecutar</button>
+			<div id="output" style="margin-top: 20px;"></div>
+		</section>
+	</main>
+
+	<script>
+		let db;
+
+		async function loadDatabase() {
+			const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}` });
+			const response = await fetch("./database.db");
+			const buffer = await response.arrayBuffer();
+			db = new SQL.Database(new Uint8Array(buffer));
+			console.log("Base de datos cargada.");
+		}
+		function resultToJSON(rawData) {
+			const JSONResult = [];
+
+			if (!rawData || rawData.length === 0) return JSONResult;
+
+			const { columns, values } = rawData[0];
+
+			values.forEach(row => {
+				const json = {};
+
+				row.forEach((val, idx) => {
+					const key = columns[idx];
+
+					// Intentar parsear si el valor es string y parece JSON
+					if (typeof val === "string" && (val.startsWith("[") || val.startsWith("{"))) {
+						try {
+							json[key] = JSON.parse(val);
+						} catch {
+							json[key] = val; // si falla, dejar como está
+						}
+					} else {
+						json[key] = val;
+					}
+				});
+
+				JSONResult.push(json);
+			});
+
+			return JSONResult;
+
+		}
+		async function runQuery() {
+			const query = document.getElementById('query').value;
+			const output = document.getElementById('output');
+			output.innerHTML = '<pre></pre>';
+			try {
+				const { result, parsedData } = await runManualQuerry(query);
+				const pre = output.querySelector('pre');
+				pre.innerHTML = JSON.stringify(parsedData, null, 4)
+			} catch (err) {
+				output.innerText = "Error: " + err.message;
+			}
+		}
+		async function runManualQuerry(query) {
+			try {
+				const result = db.exec(query);
+				if (result.length === 0) {
+					output.innerText = "Consulta ejecutada, pero no hay resultados.";
+					return;
+				}
+				const parsedData = resultToJSON(result);
+				console.log(query, "Datos procesados:", parsedData);
+				return { result, parsedData }
+			} catch (err) {
+				console.error(err);
+			}
+
+		}
+		async function main(params) {
+			await loadDatabase();
+			runQuery();
+
+			const left = document.querySelector("#left");
+			const { parsedData } = await runManualQuerry(`
+				SELECT * FROM anime_view 
+				ORDER BY SUBSTR(titles, 1) ASC;
+			`);
+
+			let lastLetter = "  ";
+			let details = null;
+			for (const anime of parsedData) {
+				if(anime.titles[0][0] !== lastLetter){
+					details = document.createElement("details");
+					details.open = true;
+					lastLetter = anime.titles[0][0];
+					details.innerHTML = `<summary>${lastLetter}</summary>`
+					left.querySelector(".list").appendChild(details);
+				}
+				details.innerHTML += `<li><b>ID${String(anime.id).padStart(5, "0")}</b> ${anime.titles[0]}</li>`
+			}
+
+		}
+		main();
+	</script>
+</body>
+
+</html>

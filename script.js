@@ -64,10 +64,10 @@ async function loadDatabase() {
     AdvancedSearcher.inizialiceFilter();
 }
 const intervals = {}
-function goTo(url) {
-    console.log(url);
+function goTo(url, scrollTop = true) {
+    
     for(const blobUrl in blobs) { if(blobUrl !== "unknown") { URL.revokeObjectURL(blobs[blobUrl]); } }
-    scrollTo(0, 0);
+    if(scrollTop) scrollTo(0, 0);
     const base = window.location.origin; // Base actual
     const newUrl = new URL(url, base);   // Construye URL absoluta
     
@@ -144,14 +144,14 @@ function preparegoTo(newUrl = location) {
         console.log("||||| HOME PAGE |||||");
         document.title = `WhereAnime`;
         const banner = mainContentHome.querySelector('section[name="banner"] .content');
-        const remainingRecentEpisodes = mainContentHome.querySelector('section[name="remainingRecentEpisodes"] .content');
-        const recentEpisodes = mainContentHome.querySelector('section[name="recentEpisodes"] .content');
-        const recentAnimes = mainContentHome.querySelector('section[name="recentAnimes"] .content');
+        const remainingRecentEpisodes = mainContentHome.querySelector('section[name="remainingRecentEpisodes"] .content .grid');
+        const recentEpisodes = mainContentHome.querySelector('section[name="recentEpisodes"] .content .grid');
+        const recentAnimes = mainContentHome.querySelector('section[name="recentAnimes"] .content .grid');
         async function refresh() {
             loadDatabase();
             const bannerAnime = database.V2_getRandomAnime();
-            document.querySelector('#background img').src = await coverAnimeImage(bannerAnime.id, bannerAnime.pages[0].thumbnail);
-            banner.querySelector(`.title`).textContent = bannerAnime.titles[0]
+            banner.parentElement.querySelector('.background img').src = await coverAnimeImage(bannerAnime.id, bannerAnime.pages[0].thumbnail);
+            banner.querySelector(`.title`).textContent = bannerAnime.titles[0];
             banner.querySelector(`.genres`).innerHTML = "";
             for(const genre of bannerAnime.genres){
                 const span = document.createElement("span");
@@ -172,7 +172,9 @@ function preparegoTo(newUrl = location) {
                 const card = document.createElement("div");
                 card.className = `card ${episode.animeType.toLowerCase().split(" ")[0]}`
                 card.innerHTML = `
-                    <div class="image"><img src="${await thumbnailAnimeImage(episode.animeId, episode.thumbnail)}" alt="${episode.title}"></div>
+                    <div class="image">
+                        <img src="${await thumbnailAnimeImage(episode.animeId, episode.thumbnail)}" alt="${episode.title}">
+                    </div>
                     <p class="title">${episode.title}</p>
                     <p class="episode">${episode.episode}</p>
                     <div class="hover">
@@ -269,11 +271,10 @@ function preparegoTo(newUrl = location) {
     async function search() {
         console.log("||||| SEARCH PAGE |||||");
         document.title = `Repositorio - WhereAnime`;
-        document.querySelector('#background img').src = ``;
         const params = new URLSearchParams(newUrl.search);
         console.log(`Search: ${newUrl.search}`);
         
-        const content = mainContentSearch.querySelector(`section[name="results"] .content`);
+        const content = mainContentSearch.querySelector(`section[name="results"] .content .grid`);
         const reqPageNumber = parseInt(params.get("n")) || 1;
         const reqQueryTitle = params.get("q") || "";
         const reqFilters = {
@@ -404,7 +405,7 @@ function preparegoTo(newUrl = location) {
             dayNavigator.parentElement.querySelector('.message').style.display = "none";
         }
 
-        const animeList = mainContentHorary.querySelector(`section[name="animeList"] .content`);
+        const animeList = mainContentHorary.querySelector(`section[name="animeList"] .content .grid`);
         
         let itemCount = 20;
         if (reqPageNumber < 1) { goTo(`/horary/${reqDay}/1`); return; }
@@ -476,26 +477,37 @@ function preparegoTo(newUrl = location) {
         document.title = `${anime.titles[0]} - WhereAnime`;
 
         const animeData = mainContentAnime.querySelector('section[name="animeData"] .content')
+        const background = mainContentAnime.querySelector('section[name="animeData"] .background')
+
         animeData.className = `content ${anime.type.toLowerCase()}`
-        document.querySelector('#background img').src = await coverAnimeImage(anime.id, anime.pages.length > 0 ? anime.pages[0].thumbnail : "");
+
+        background.querySelector('img').src = await coverAnimeImage(anime.id, anime.pages.length > 0 ? anime.pages[0].thumbnail : "");
+
+        // Portada
         animeData.querySelector('.image img').src = await coverAnimeImage(anime.id, anime.pages.length > 0 ? anime.pages[0].thumbnail : "");
+
+        // Titulo
         animeData.querySelector('.title').textContent = anime.titles[0]
-        switch (anime.status.toLowerCase()) {
-            case "en emision": animeData.querySelector('.status').className = `status onair`; break;
-            case "finalizado": animeData.querySelector('.status').className = `status ended`; break;
-            default: animeData.querySelector('.status').className = `status unknown`; break;
-        }
-        
+
+        // Estado
+        let statusClass = "status unknown";
+        if (anime.status.toLowerCase() === "en emision") statusClass = `status onair`;
+        if (anime.status.toLowerCase() === "finalizado") statusClass = `status ended`;
         animeData.querySelector('.status').textContent = anime.status
+        animeData.querySelector('.status').className = statusClass
         animeData.querySelector('.status').onclick = () => {
             AdvancedSearcher.resetFilter();
             goTo(`/search/?status=${anime.status}`)
         }
+
+        // Tipo
         animeData.querySelector('.type').textContent = anime.type;
         animeData.querySelector('.type').onclick = () => {
             AdvancedSearcher.resetFilter();
             goTo(`/search/?type=${anime.type}`)
         }
+
+        // Paginas
         animeData.querySelector('.pages').innerHTML = "";
         for(const page of anime.pages){
             const span = document.createElement("span");
@@ -511,23 +523,36 @@ function preparegoTo(newUrl = location) {
                 animeData.querySelector('.pages').insertAdjacentHTML('beforeend', "<span>, </span>");
             }
         }
+
+        // Idioma
         animeData.querySelector('.lang').textContent = anime.lang;
         animeData.querySelector('.lang').onclick = () => {
             AdvancedSearcher.resetFilter();
             goTo(`/search/?lang=${anime.lang}`)
         }
-        animeData.querySelector('.genres').innerHTML = "";
-        for(const genre of anime.genres){
-            const span = document.createElement("span");
-            span.classList.add("clickable");
-            span.textContent = genre;
-            span.onclick = () => {
-                AdvancedSearcher.resetFilter();
-                goTo(`/search/?genre=${genre.replaceAll(" ", "-").toLowerCase()}`)
+
+        // Generos
+        if(anime.genres.length > 0){
+            animeData.querySelector('.genres').innerHTML = "";
+            for(const genre of anime.genres){
+                const span = document.createElement("span");
+                span.classList.add("clickable");
+                span.textContent = genre;
+                span.onclick = () => {
+                    AdvancedSearcher.resetFilter();
+                    goTo(`/search/?genre=${genre.replaceAll(" ", "-").toLowerCase()}`)
+                }
+                animeData.querySelector('.genres').appendChild(span);
             }
-            animeData.querySelector('.genres').appendChild(span);
+            // animeData.querySelector('.genres').style.display = "";
+        }else{
+            // animeData.querySelector('.genres').style.display = "none";
         }
+
+        // Numero de episodios
         animeData.querySelector('.episodes').textContent = anime.episodes.length;
+
+        // Proxima emision
         if(anime.status === "En Emision"){
             let date = new Date((anime.episodes.length > 0 ? anime.episodes[0].timestamp : 0) + (7 * 24 * 60 * 60 * 1000));
             animeData.querySelector('.nextDate').textContent = `${dayMap[date.getDay()]["es"]} (${date.toLocaleDateString()})`;
@@ -537,18 +562,41 @@ function preparegoTo(newUrl = location) {
             animeData.querySelector('.nextDate').parentElement.style.display = "";
         }else{
             animeData.querySelector('.nextDate').parentElement.style.display = "none";
-            animeData.querySelector('.nextDate').textContent = "";
-
         }
-        animeData.querySelector('.lastDate').textContent = new Date(anime.episodes.length > 0 ? anime.episodes[0].timestamp : 0).toLocaleDateString();
+
+        // Primera emision
         animeData.querySelector('.firstDate').textContent = new Date(anime.timestamp).toLocaleDateString();
-        if (anime.titles.slice(1).length > 0) {
+
+        // Ultima emision
+        animeData.querySelector('.lastDate').textContent = new Date(anime.episodes.length > 0 ? anime.episodes[0].timestamp : 0).toLocaleDateString();
+        
+        
+        // Relaciones
+        if (anime.related.length > 0) {
+            animeData.querySelector('.related').innerHTML = "";
+            for(const related of anime.related){
+                const span = document.createElement("span");
+                span.classList.add("clickable");
+                span.textContent = `${related.title} - ${related.relation}`;
+                span.onclick = () => {
+                    goTo(`/anime/${related.title}`)
+                }
+                animeData.querySelector('.related').appendChild(span);
+            }
+            animeData.querySelector('.related').parentElement.style.display = "";
+        }else{
+            animeData.querySelector('.related').parentElement.style.display = "none";
+        }
+
+        // Otros titulos
+        if (anime.titles.length > 1) {
             animeData.querySelector('.otherTitles').innerHTML = ` - ${anime.titles.slice(1).join("<br> - ")}`;
             animeData.querySelector('.otherTitles').parentElement.style.display = "";
         } else {
             animeData.querySelector('.otherTitles').parentElement.style.display = "none";
         }
-        const episodeList = mainContentAnime.querySelector('section[name="episodeList"] .content')
+        
+        const episodeList = mainContentAnime.querySelector('section[name="episodeList"] .content .grid')
         let itemCount = 8;
         if (reqPageNumber < 1) { goTo(`/anime/${encodeURIComponent(reqAnimeTitle)}/1`); return; }
         if (reqPageNumber > 1 && reqPageNumber > Math.ceil(anime.episodes.length / itemCount)) { goTo(`/anime/${encodeURIComponent(reqAnimeTitle)}/${Math.ceil(anime.episodes.length / itemCount)}`); return; }
@@ -595,7 +643,7 @@ function preparegoTo(newUrl = location) {
             a.innerHTML = text;
             if (value !== cur && value > 0 && value <= max) {
                 a.className = "button";
-                a.onclick = () => { goTo(`/anime/${anime.titles[0]}/${value}`); };
+                a.onclick = () => { goTo(`/anime/${anime.titles[0]}/${value}`, false); };
             } else {
                 if (text === cur) {
                     a.className = "current";
@@ -621,10 +669,12 @@ function preparegoTo(newUrl = location) {
         if (!episode) { goTo(`/anime/${encodeURIComponent(reqAnimeTitle)}`); return; }
         document.title = `${anime.titles[0]} - WhereAnime`;
 
-        const animeData = mainContentEpisode.querySelector('section[name="animeData"] .content')
+        const background = mainContentEpisode.querySelector('section[name="animeData"] .background');
+        background.querySelector('img').src = await coverAnimeImage(anime.id, anime.pages[0].thumbnail);
+
+        const animeData = mainContentEpisode.querySelector('section[name="animeData"] .content');
         animeData.className = `content ${anime.type.toLowerCase()}`
         animeData.querySelector('.image').onclick = () => goTo(`/anime/${encodeURIComponent(reqAnimeTitle)}`);
-        document.querySelector('#background img').src = await coverAnimeImage(anime.id, anime.pages[0].thumbnail);
         animeData.querySelector('.image img').src = await coverAnimeImage(anime.id, anime.pages[0].thumbnail);
         switch (anime.status.toLowerCase()) {
             case "en emision": animeData.querySelector('.status').className = `status onair`; break;
@@ -648,7 +698,7 @@ function preparegoTo(newUrl = location) {
         } else {
             animeData.querySelector('.otherTitles').parentElement.style.display = "none";
         }
-        const episodeLinks = mainContentEpisode.querySelector('section[name="episodeLinks"] .content')
+        const episodeLinks = mainContentEpisode.querySelector('section[name="episodeLinks"] .content .grid')
         let i = 0;
         let itemCount = 8;
         if (reqPageNumber < 1) { goTo(`/episode/${encodeURIComponent(reqAnimeTitle)}/1`); return; }
@@ -711,7 +761,7 @@ function preparegoTo(newUrl = location) {
         mainContentEpisode.style.display = "";
     }
 
-    let routeSearch = new URLSearchParams(newUrl.search);
+    const routeSearch = new URLSearchParams(newUrl.search);
     let routePath = newUrl.href;
     routePath = routePath.substring(newUrl.origin.length, routePath.length)
     if(routePath.includes("?")){
@@ -810,8 +860,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     // Home page
     for (let index = 0; index < 19; index++) {
-        mainContentHome.querySelector('section[name="recentEpisodes"] .content').innerHTML += `<div class="card anime"><div class="image"><img src="" alt=""></div></div>`;
-        mainContentHome.querySelector('section[name="recentAnimes"] .content').innerHTML += `<div class="card anime"><div class="image"><img src="" alt=""></div></div>`;
+        mainContentHome.querySelector('section[name="recentEpisodes"] .content .grid').innerHTML += `<div class="card anime"><div class="image"><img src="" alt=""></div></div>`;
+        mainContentHome.querySelector('section[name="recentAnimes"] .content .grid').innerHTML += `<div class="card anime"><div class="image"><img src="" alt=""></div></div>`;
     }
     
     // Horary Page

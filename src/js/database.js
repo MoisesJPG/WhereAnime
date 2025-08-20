@@ -59,6 +59,7 @@ export class database {
         } catch (err) {
             console.error('Error cargando JSON:', err);
         }
+        return true;
     }
     static V2_getAnimes() {
         if (this.config.AC) {
@@ -88,7 +89,7 @@ export class database {
         let response = animes.map(anime => { return {
             animeId: anime.id,
             animeType: anime.type,
-            thumbnail: anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail,
+            thumbnail: anime.pages.length > 0 ? anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail : "",
             title: anime.titles[0],
             episode: anime.episodes[0].episode + 1,
             timestamp: anime.episodes[0].timestamp + (7 * 24 * 60 * 60 * 1000),
