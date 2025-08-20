@@ -220,10 +220,11 @@ function preparegoTo(newUrl = location) {
             const animes = database.V2_getRecentAnimes();
             for (let i = 0; i < animes.length; i++) {
                 const anime = animes[i];
+                const closed = anime.pageNames.length === 1 && database.closedPages.includes(anime.pageNames[0])
                 const card = document.createElement("div");
-                card.className = `card ${anime.type.toLowerCase().split(" ")[0]}`
+                card.className = `card ${anime.type.toLowerCase().split(" ")[0]} ${closed ? " closed" : ""}`
                 card.innerHTML = `
-                    <div class="image"><img src="${await thumbnailAnimeImage(anime.id, anime.thumbnail)}" alt="${anime.title}"></div>
+                    <div class="image"><img src="${closed ? "./src/images/page_closed.png":await thumbnailAnimeImage(anime.id, anime.thumbnail)}" alt="${anime.title}"></div>
                     <p class="title">${anime.title}</p>
                     <div class="hover">
                         <p>Titulo: ${anime.title}</p>
@@ -232,7 +233,9 @@ function preparegoTo(newUrl = location) {
                         ${anime.otherTitles.length > 0 ? `<p>Otros titulos:<br> - ${anime.otherTitles.join("<br> - ")}</p>` : ""}
                     </div>
                 `;
-                card.onclick = () => goTo(`/anime/${encodeURIComponent(anime.title)}`)
+                if(!closed){
+                    card.onclick = () => goTo(`/anime/${encodeURIComponent(anime.title)}`)
+                }
                 if (recentAnimes.children[i]) {
                     recentAnimes.replaceChild(card, recentAnimes.children[i]);
                 } else {
@@ -314,12 +317,16 @@ function preparegoTo(newUrl = location) {
             return; 
         }
         let i = 0;
-        for (let o = (reqPageNumber - 1) * itemCount; o < Math.min(reqPageNumber * itemCount, animes.length); o++, i++) {
+        let start = (reqPageNumber - 1) * itemCount;
+        let end = Math.min(reqPageNumber * itemCount, animes.length);
+        for (let o = start; o < end; o++, i++) {
+            
             const anime = animes[o];
+            const closed = anime.pageNames.length === 1 && database.closedPages.includes(anime.pageNames[0])
             const card = document.createElement("div");
-            card.className = `card ${anime.type.toLowerCase().split(" ")[0]}`
+            card.className = `card ${anime.type.toLowerCase().split(" ")[0]}${closed ? " closed": ""}`
             card.innerHTML = `
-                <div class="image"><img src="${await thumbnailAnimeImage(anime.id,anime.thumbnail)}" alt="${anime.title}"></div>
+                <div class="image"><img src="${closed ? "./src/images/page_closed.png": await thumbnailAnimeImage(anime.id, anime.thumbnail)}" alt="${anime.title}"></div>
                 <p class="title">${highlightMatch(anime.title, decodeURIComponent(reqQueryTitle))}</p>
                 <div class="hover">
                     <p>Titulo: ${highlightMatch(anime.title, decodeURIComponent(reqQueryTitle))}</p>
@@ -328,7 +335,9 @@ function preparegoTo(newUrl = location) {
                     ${anime.otherTitles.length > 0 ? `<p>Otros titulos:<br> - ${highlightMatch(anime.otherTitles.join("<br> - "), decodeURIComponent(reqQueryTitle))}</p>` : ""}
                 </div>
             `;
-            card.onclick = () => goTo(`/anime/${encodeURIComponent(anime.title)}`)
+            if(!closed){
+                card.onclick = () => goTo(`/anime/${encodeURIComponent(anime.title)}`)
+            }
             if (content.children[i]) {
                 content.replaceChild(card, content.children[i]);
             } else {
@@ -397,13 +406,6 @@ function preparegoTo(newUrl = location) {
         dayNavigator.querySelectorAll(`a`).forEach(el => {el.classList.remove("current"); el.classList.add("button");});
         dayNavigator.querySelector(`a[name="${reqDay}"]`).classList.add("current");
         dayNavigator.querySelector(`a[name="${reqDay}"]`).classList.remove("button");
-        if(reqDay === "thursday"){
-            dayNavigator.parentElement.querySelector('.message').textContent = "Puede que aparezcan animes de mas mientras organizo la base de datos";
-            dayNavigator.parentElement.querySelector('.message').style.display = "";
-        }else{
-            dayNavigator.parentElement.querySelector('.message').textContent = "";
-            dayNavigator.parentElement.querySelector('.message').style.display = "none";
-        }
 
         const animeList = mainContentHorary.querySelector(`section[name="animeList"] .content .grid`);
         
@@ -510,9 +512,10 @@ function preparegoTo(newUrl = location) {
         // Paginas
         animeData.querySelector('.pages').innerHTML = "";
         for(const page of anime.pages){
+            const closed = database.closedPages.includes(page.page)
             const span = document.createElement("span");
             span.classList.add("clickable");
-            span.textContent = page.page;
+            span.textContent = `${page.page}${closed ? " (Closed)": ""}`;
             span.onclick = () => {
                 AdvancedSearcher.resetFilter();
                 console.log(`/search/?page=${page.page.replaceAll(" ", "-").toLowerCase()}`)
@@ -703,12 +706,15 @@ function preparegoTo(newUrl = location) {
         let itemCount = 8;
         if (reqPageNumber < 1) { goTo(`/episode/${encodeURIComponent(reqAnimeTitle)}/1`); return; }
         if (reqPageNumber > Math.ceil(anime.episodes.length / itemCount)) { goTo(`/episode/${encodeURIComponent(reqAnimeTitle)}/${Math.ceil(episode.urls.length / itemCount)}`); return; }
-        for (let o = (reqPageNumber - 1) * itemCount; o < Math.min(reqPageNumber * itemCount, episode.urls.length); o++, i++) {
+        let start = (reqPageNumber - 1) * itemCount;
+        let end = Math.min(reqPageNumber * itemCount, episode.urls.length);
+        for (let o = start; o < end; o++, i++) {
             const url = episode.urls[o];
+            const closedPage = database.closedPages.includes(url.page);
             const card = document.createElement("div");
-            card.className = `card ${anime.type.toLowerCase().split(" ")[0]}`
+            card.className = `card ${anime.type.toLowerCase().split(" ")[0]}${closedPage ? " closed": ""}`;
             card.innerHTML = `
-                <p class="page">${url.page}</p>
+                <p class="page">${url.page}${closedPage ? " (Closed)": ""}</p>
                 <div class="image"><img src="${await thumbnailAnimeImage(anime.id, anime.pages[0].thumbnail)}" alt="${anime.titles[0]}"></div>
                 <div class="hover">
                     <p>Titulo: ${anime.titles[0]}</p>
@@ -716,11 +722,13 @@ function preparegoTo(newUrl = location) {
                     <p>Fecha: ${new Date(anime.timestamp).toLocaleDateString()}</p>
                 </div>
             `;
-            card.onclick = () => {
-                if (confirm("")) {
-                    window.open(url.url, '_blank')
-                }
-            };
+            if(!closedPage){
+                card.onclick = () => {
+                    if (confirm("")) {
+                        window.open(url.url, '_blank')
+                    }
+                };
+            }
             if (episodeLinks.children[i]) {
                 episodeLinks.replaceChild(card, episodeLinks.children[i]);
             } else {

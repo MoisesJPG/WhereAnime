@@ -92,8 +92,9 @@ export class AdvancedSearcher {
 
         // Preparando las paginas
         for (const page of Object.keys(this.#getFilter("pages")).sort((a, b) => a.localeCompare(b))) {
+            const closed = database.closedPages.includes(page);
             const p = document.createElement("p");
-            p.innerHTML = `<input type="checkbox" class="page" name="${page}">${page}`;
+            p.innerHTML = `<input type="checkbox" class="page" name="${page}">${page}${closed ? " (Cerrado)": ""}`;
             p.classList.add("clickable");
             const c = p.querySelector('input[type="checkbox"]');
             c.classList.add("clickable");
@@ -235,6 +236,7 @@ export class AdvancedSearcher {
                     id: a.id,
                     title: a.titles[0],
                     otherTitles: a.titles.slice(1),
+                    pageNames: a.pages.map(p => {return p.page}),
                     type: a.type,
                     thumbnail: a.pages.length > 0 ? a.pages[0].thumbnail : "",
                     episodeCount: a.episodes.length,

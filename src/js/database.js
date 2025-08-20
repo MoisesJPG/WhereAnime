@@ -1,6 +1,9 @@
 import { log } from "./v2/misc.js";
 
 export class database {
+    static closedPages = [
+        "OtakusTV"
+    ]
     static config = {
         page: "all",
         AC: false,
@@ -132,6 +135,7 @@ export class database {
                 title: anime.titles[0],
                 type: anime.type,
                 thumbnail: anime.pages.filter(page => page.page.toLowerCase() === this.config.page || this.config.page === "all")[0].thumbnail,
+                pageNames: anime.pages.map(p => { return p.page}),
                 timestamp: anime.timestamp,
                 episodeCount: anime.episodes.length,
                 otherTitles: anime.titles.slice(1)
