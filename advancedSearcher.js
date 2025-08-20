@@ -236,6 +236,7 @@ export class AdvancedSearcher {
                     id: a.id,
                     title: a.titles[0],
                     otherTitles: a.titles.slice(1),
+                    pages: a.pages,
                     pageNames: a.pages.map(p => {return p.page}),
                     type: a.type,
                     thumbnail: a.pages.length > 0 ? a.pages[0].thumbnail : "",

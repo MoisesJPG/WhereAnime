@@ -322,11 +322,14 @@ function preparegoTo(newUrl = location) {
         for (let o = start; o < end; o++, i++) {
             
             const anime = animes[o];
+            console.log(anime);
+            const thumbnail = anime.pages.find(p => !database.closedPages.includes(p.page))?.thumbnail;
+
             const closed = anime.pageNames.length === 1 && database.closedPages.includes(anime.pageNames[0])
             const card = document.createElement("div");
             card.className = `card ${anime.type.toLowerCase().split(" ")[0]}${closed ? " closed": ""}`
             card.innerHTML = `
-                <div class="image"><img src="${closed ? "./src/images/page_closed.png": await thumbnailAnimeImage(anime.id, anime.thumbnail)}" alt="${anime.title}"></div>
+                <div class="image"><img src="${closed ? "./src/images/page_closed.png": await thumbnailAnimeImage(anime.id, thumbnail)}" alt="${anime.title}"></div>
                 <p class="title">${highlightMatch(anime.title, decodeURIComponent(reqQueryTitle))}</p>
                 <div class="hover">
                     <p>Titulo: ${highlightMatch(anime.title, decodeURIComponent(reqQueryTitle))}</p>
@@ -475,6 +478,8 @@ function preparegoTo(newUrl = location) {
         const reqAnimeTitle = decodeURIComponent(config.route[1]);
         const reqPageNumber = parseInt(config.route[2]) || 1;
         const anime = database.V2_findAnimeByMainTitle(reqAnimeTitle)
+        console.log(anime);
+        
         if (!anime) { goTo("/"); return; }
         document.title = `${anime.titles[0]} - WhereAnime`;
 
@@ -482,11 +487,12 @@ function preparegoTo(newUrl = location) {
         const background = mainContentAnime.querySelector('section[name="animeData"] .background')
 
         animeData.className = `content ${anime.type.toLowerCase()}`
+        const thumbnail = anime.pages.find(p => !database.closedPages.includes(p.page))?.thumbnail;
 
-        background.querySelector('img').src = await coverAnimeImage(anime.id, anime.pages.length > 0 ? anime.pages[0].thumbnail : "");
+        background.querySelector('img').src = await coverAnimeImage(anime.id, thumbnail);
 
         // Portada
-        animeData.querySelector('.image img').src = await coverAnimeImage(anime.id, anime.pages.length > 0 ? anime.pages[0].thumbnail : "");
+        animeData.querySelector('.image img').src = await coverAnimeImage(anime.id, thumbnail);
 
         // Titulo
         animeData.querySelector('.title').textContent = anime.titles[0]
@@ -610,7 +616,7 @@ function preparegoTo(newUrl = location) {
             const card = document.createElement("div");
             card.className = `card ${anime.type.toLowerCase().split(" ")[0]}`
             card.innerHTML = `
-                <div class="image"><img src="${await thumbnailAnimeImage(anime.id,anime.pages[0].thumbnail)}" alt="${anime.titles[0]}"></div>
+                <div class="image"><img src="${await thumbnailAnimeImage(anime.id, thumbnail)}" alt="${anime.titles[0]}"></div>
                 <p class="title">${anime.titles[0]}</p>
                 <p class="episode">${episode.episode}</p>
                 <div class="hover">
@@ -672,13 +678,14 @@ function preparegoTo(newUrl = location) {
         if (!episode) { goTo(`/anime/${encodeURIComponent(reqAnimeTitle)}`); return; }
         document.title = `${anime.titles[0]} - WhereAnime`;
 
+        const thumbnail = anime.pages.find(p => !database.closedPages.includes(p.page))?.thumbnail;
         const background = mainContentEpisode.querySelector('section[name="animeData"] .background');
-        background.querySelector('img').src = await coverAnimeImage(anime.id, anime.pages[0].thumbnail);
+        background.querySelector('img').src = await coverAnimeImage(anime.id, thumbnail);
 
         const animeData = mainContentEpisode.querySelector('section[name="animeData"] .content');
         animeData.className = `content ${anime.type.toLowerCase()}`
         animeData.querySelector('.image').onclick = () => goTo(`/anime/${encodeURIComponent(reqAnimeTitle)}`);
-        animeData.querySelector('.image img').src = await coverAnimeImage(anime.id, anime.pages[0].thumbnail);
+        animeData.querySelector('.image img').src = await coverAnimeImage(anime.id, thumbnail);
         switch (anime.status.toLowerCase()) {
             case "en emision": animeData.querySelector('.status').className = `status onair`; break;
             case "finalizado": animeData.querySelector('.status').className = `status ended`; break;
@@ -715,7 +722,7 @@ function preparegoTo(newUrl = location) {
             card.className = `card ${anime.type.toLowerCase().split(" ")[0]}${closedPage ? " closed": ""}`;
             card.innerHTML = `
                 <p class="page">${url.page}${closedPage ? " (Closed)": ""}</p>
-                <div class="image"><img src="${await thumbnailAnimeImage(anime.id, anime.pages[0].thumbnail)}" alt="${anime.titles[0]}"></div>
+                <div class="image"><img src="${await thumbnailAnimeImage(anime.id, thumbnail)}" alt="${anime.titles[0]}"></div>
                 <div class="hover">
                     <p>Titulo: ${anime.titles[0]}</p>
                     <p>Episodio: ${episode.episode}</p>

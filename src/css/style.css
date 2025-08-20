@@ -52,7 +52,7 @@ header > .content h1 {
     color: white;
     user-select: none;
 }
-header > .content nav {}
+/* header > .content nav {} */
 header > .content nav .switch-nav {
     display: none;
 }
@@ -426,9 +426,7 @@ main .content[name="search"] section[name="filter"] .content nav .advanced {
     display: flex;
     gap: 16px;
 }
-main .content[name="search"] section[name="filter"] .content nav .advanced details {
-
-}
+/* main .content[name="search"] section[name="filter"] .content nav .advanced details {} */
 main .content[name="search"] section[name="filter"] .content nav .advanced details summary {
     width:       100%;
     height:      20px;
